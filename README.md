@@ -22,6 +22,26 @@
 
 **Regla de Oro**: ¡No toques los "hooks" complejos (`useState`, `useEffect`) de lógica de negocio profunda ni el flujo de datos! Concéntrate en la experiencia visual, la fluidez y en arreglar advertencias menores.
 
+### 🗺️ Mapa de Rutas Disponibles (UI)
+Para facilitar tus pruebas, aquí tienes todas las rutas que ya están maquetadas en el sistema. Puedes acceder a ellas directamente desde tu navegador (`http://localhost:3000/...`):
+
+**Pública / Autenticación:**
+* `/` - Pantalla de Login (Glassmorphism)
+* `/verify/12345` - Vista Pública de Validación de Vouchers (QR)
+
+**Panel de Administrador (Root):**
+* `/admin` - Dashboard Principal
+* `/admin/vessels` - Grid de Embarcaciones y Estados
+* `/admin/audit` - Tabla de Historial de Auditoría
+
+**Portal B2B (Agencias de Viaje):**
+* `/agency` - Buscador de Disponibilidad (con máscara de fecha y reservas)
+* `/agency/reservations` - Historial de Mis Reservas y descarga de vouchers
+
+**App Móvil (Dueños de Embarcación / Capitanes):**
+* `/operator` - Inicio / Dashboard Móvil (Próximo Zarpe)
+* `/operator/availability` - Gestor Táctil de Cupos (+ / -)
+
 ---
 ## Getting Started
 
