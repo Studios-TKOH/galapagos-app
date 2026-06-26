@@ -1,65 +1,83 @@
+"use client";
+
+import Link from "next/link";
+import { Ship, Mail, Key, ArrowRight } from "lucide-react";
 import Image from "next/image";
 
-export default function Home() {
+export default function LoginPage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+    <div className="min-h-screen relative flex items-center justify-center p-4">
+      {/* Imagen de fondo a pantalla completa */}
+      <div className="absolute inset-0 z-0">
         <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
+          src="https://images.unsplash.com/photo-1549449830-4e3edce6c1a8?q=80&w=2072&auto=format&fit=crop"
+          alt="Galapagos Background"
+          fill
+          className="object-cover"
           priority
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+        {/* Overlay oscuro para legibilidad */}
+        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px]"></div>
+      </div>
+
+      {/* Tarjeta de Login (Glassmorphism) */}
+      <div className="relative z-10 w-full max-w-md animate-in fade-in zoom-in duration-500">
+        <div className="glass bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-8 sm:p-10 rounded-[2rem] shadow-2xl shadow-black/50">
+          
+          {/* Logo y Encabezado */}
+          <div className="flex flex-col items-center text-center mb-10">
+            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-primary/30">
+              <Ship className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-2">Bienvenido</h1>
+            <p className="text-slate-300">Plataforma de Gestión y Reservas</p>
+          </div>
+
+          {/* Formulario */}
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-200 ml-1">Correo Electrónico</label>
+              <div className="relative">
+                <Mail className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  type="email" 
+                  placeholder="admin@galapagos.com"
+                  className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/20 bg-white/5 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary focus:bg-white/10 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between ml-1">
+                <label className="text-sm font-medium text-slate-200">Contraseña</label>
+                <a href="#" className="text-xs text-primary hover:text-blue-400 transition-colors">¿Olvidaste tu clave?</a>
+              </div>
+              <div className="relative">
+                <Key className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  type="password" 
+                  placeholder="••••••••"
+                  className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/20 bg-white/5 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary focus:bg-white/10 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <Link 
+              href="/admin"
+              className="group flex items-center justify-center gap-2 w-full py-4 mt-8 bg-primary hover:bg-blue-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-primary/30"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              Iniciar Sesión
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+          
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        
+        {/* Footer info */}
+        <p className="text-center text-sm text-slate-400 mt-8">
+          © 2026 Galapagos Booking System.
+        </p>
+      </div>
     </div>
   );
 }
