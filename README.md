@@ -1,5 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚢 Galapagos System - Proyecto Principal
 
+---
+
+## 🎨 TAREAS PARA EL ASISTENTE DE UI (UI ASSISTANT)
+¡Hola! Si estás leyendo esto, es porque vas a ayudar a pulir la interfaz visual de este proyecto. La estructura base, los componentes pesados y la lógica de enrutamiento ya están listos. 
+
+**Para no complicarte la vida, por favor enfócate ÚNICAMENTE en estas tareas sencillas:**
+
+1. **Efectos Hover (Interacciones sutiles)**: 
+   - Revisa los botones en `/admin` y `/agency`. Asegúrate de que todos tengan clases como `hover:scale-105`, `active:scale-95` o `transition-all duration-300` para que se sientan vivos al pasar el mouse.
+2. **Modo Oscuro (Dark Mode) Consistente**: 
+   - Busca fondos que se sientan muy brillantes de noche. Asegúrate de que las tarjetas usen `dark:bg-slate-900` o `dark:bg-slate-800` y textos `dark:text-white` o `dark:text-slate-300`.
+3. **Píldoras y Badges**:
+   - Revisa los estados (Confirmado, Pendiente, Cancelado) en la tabla de Auditoría (`/admin/audit/page.tsx`) y en Reservas (`/agency/reservations/page.tsx`). Asegúrate de que los colores sean consistentes.
+4. **Imágenes de Fondo**:
+   - En la vista de login (`/page.tsx`) o el buscador de agencias (`/agency/page.tsx`), puedes experimentar cambiando los links de las fotos de `Unsplash` por fotos de Galápagos aún más espectaculares.
+5. **Íconos**:
+   - Todo el proyecto usa `lucide-react`. Si un ícono te parece aburrido, cámbialo por uno mejor de la librería.
+
+**Regla de Oro**: ¡No toques los "hooks" (`useState`, `useEffect`) ni la lógica de datos! Solo diviértete con las clases de Tailwind CSS (`className="..."`).
+
+---
 ## Getting Started
 
 First, run the development server:
