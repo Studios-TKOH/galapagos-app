@@ -5,20 +5,22 @@
 ## 🎨 TAREAS PARA EL ASISTENTE DE UI (UI ASSISTANT)
 ¡Hola! Si estás leyendo esto, es porque vas a ayudar a pulir la interfaz visual de este proyecto. La estructura base, los componentes pesados y la lógica de enrutamiento ya están listos. 
 
-**Para no complicarte la vida, por favor enfócate ÚNICAMENTE en estas tareas sencillas:**
+**Para no complicarte la vida, por favor enfócate ÚNICAMENTE en estas tareas:**
 
-1. **Efectos Hover (Interacciones sutiles)**: 
-   - Revisa los botones en `/admin` y `/agency`. Asegúrate de que todos tengan clases como `hover:scale-105`, `active:scale-95` o `transition-all duration-300` para que se sientan vivos al pasar el mouse.
-2. **Modo Oscuro (Dark Mode) Consistente**: 
+1. **Cacería de Bugs Visuales (QA Visual)**:
+   - Navega por todas las pantallas simulando ser un usuario real. Si ves algún texto desalineado, un botón que se corta en móviles o algo que "se vea raro", corrígelo usando clases de Tailwind.
+2. **Mejora de Animaciones (Smooth UI)**: 
+   - Revisa las transiciones. Añade animaciones suaves en los modales, botones y tarjetas (ej. `transition-all duration-300 ease-in-out`, `hover:scale-105`, `active:scale-95`). El sistema debe sentirse "vivo".
+3. **Modo Oscuro (Dark Mode) Consistente**: 
    - Busca fondos que se sientan muy brillantes de noche. Asegúrate de que las tarjetas usen `dark:bg-slate-900` o `dark:bg-slate-800` y textos `dark:text-white` o `dark:text-slate-300`.
-3. **Píldoras y Badges**:
-   - Revisa los estados (Confirmado, Pendiente, Cancelado) en la tabla de Auditoría (`/admin/audit/page.tsx`) y en Reservas (`/agency/reservations/page.tsx`). Asegúrate de que los colores sean consistentes.
-4. **Imágenes de Fondo**:
-   - En la vista de login (`/page.tsx`) o el buscador de agencias (`/agency/page.tsx`), puedes experimentar cambiando los links de las fotos de `Unsplash` por fotos de Galápagos aún más espectaculares.
-5. **Íconos**:
-   - Todo el proyecto usa `lucide-react`. Si un ícono te parece aburrido, cámbialo por uno mejor de la librería.
+4. **Auditoría de Consola y Advertencias**:
+   - Abre las herramientas de desarrollador del navegador (F12) y revisa la consola. Si encuentras advertencias de React (ej. falta de `key` en listas, clases anidadas incorrectas) o errores leves, arréglalos.
+5. **Píldoras, Badges e Íconos**:
+   - Revisa los estados (Confirmado, Pendiente, Cancelado). Asegúrate de que los colores sean consistentes. Todo el proyecto usa `lucide-react`, si ves íconos que no encajan, cámbialos.
+6. **Mejoras de Accesibilidad y UX**:
+   - Si crees que un texto es muy pequeño o un contraste de colores dificulta la lectura, mejóralo. Tu instinto de diseño manda aquí.
 
-**Regla de Oro**: ¡No toques los "hooks" (`useState`, `useEffect`) ni la lógica de datos! Solo diviértete con las clases de Tailwind CSS (`className="..."`).
+**Regla de Oro**: ¡No toques los "hooks" complejos (`useState`, `useEffect`) de lógica de negocio profunda ni el flujo de datos! Concéntrate en la experiencia visual, la fluidez y en arreglar advertencias menores.
 
 ---
 ## Getting Started
