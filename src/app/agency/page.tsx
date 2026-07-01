@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Search, Calendar, MapPin, Users, Filter, Clock, Ship, CheckCircle2 } from "lucide-react";
 import { BookingModal } from "@/components/agency/BookingModal";
+import type { BookingTour } from "@/components/agency/BookingModal";
 
 // Mock data para los resultados de búsqueda
 const mockResults = [
@@ -30,7 +31,7 @@ const mockResults = [
 ];
 
 export default function AgencySearchPage() {
-  const [selectedTour, setSelectedTour] = useState<any>(null);
+  const [selectedTour, setSelectedTour] = useState<BookingTour | null>(null);
   const [dateSearch, setDateSearch] = useState("");
 
   // Máscara inteligente con validación básica de Día (max 31) y Mes (max 12)
@@ -95,19 +96,21 @@ export default function AgencySearchPage() {
           <div className="mt-8 bg-white dark:bg-slate-900 rounded-3xl p-3 shadow-2xl flex flex-col md:flex-row items-center gap-3 w-full">
             <div className="flex-1 w-full flex items-center px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl relative">
               <MapPin className="w-5 h-5 text-primary mr-3 shrink-0" />
-              <input type="text" placeholder="¿A dónde?" className="bg-transparent border-none outline-none w-full text-slate-900 dark:text-white font-medium placeholder:text-slate-500" />
+              <input type="text" aria-label="Destino" placeholder="¿A dónde?" className="bg-transparent border-none outline-none w-full text-slate-900 dark:text-white font-medium placeholder:text-slate-500" />
             </div>
             
             <div className="w-full md:w-48 flex items-center px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border-x border-transparent md:border-slate-100 dark:md:border-slate-700 relative group">
               {/* Truco: Input nativo de fecha invisible encima del ícono para invocar el calendario */}
               <input 
                 type="date" 
+                aria-label="Abrir calendario de salida"
                 className="absolute left-0 top-0 w-12 h-full opacity-0 cursor-pointer z-10"
                 onChange={handleNativeDateChange}
               />
               <Calendar className="w-5 h-5 text-primary mr-3 shrink-0 group-hover:scale-110 transition-transform" />
               <input 
                 type="text" 
+                aria-label="Fecha de salida en formato día, mes y año"
                 value={dateSearch}
                 onChange={handleDateChange}
                 placeholder="DD/MM/AAAA" 
@@ -117,10 +120,10 @@ export default function AgencySearchPage() {
 
             <div className="w-full md:w-40 flex items-center px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl">
               <Users className="w-5 h-5 text-primary mr-3 shrink-0" />
-              <input type="number" placeholder="2 Pasaj." min="1" className="bg-transparent border-none outline-none w-full text-slate-900 dark:text-white font-medium placeholder:text-slate-500" />
+              <input type="number" aria-label="Número de pasajeros" placeholder="2 Pasaj." min="1" className="bg-transparent border-none outline-none w-full text-slate-900 dark:text-white font-medium placeholder:text-slate-500" />
             </div>
 
-            <button className="w-full md:w-auto h-full px-8 py-4 bg-primary hover:bg-blue-600 text-white font-bold rounded-2xl transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-2">
+            <button type="button" className="w-full md:w-auto min-h-14 px-8 py-4 bg-primary hover:bg-blue-600 text-white font-bold rounded-2xl transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
               <Search className="w-5 h-5" />
               Buscar
             </button>
@@ -136,7 +139,7 @@ export default function AgencySearchPage() {
           <p className="font-medium text-slate-600 dark:text-slate-300">
             <span className="font-bold text-slate-900 dark:text-white">2 salidas</span> encontradas
           </p>
-          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+          <button type="button" className="min-h-11 flex items-center gap-2 px-4 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
             <Filter className="w-4 h-4" />
             Filtros
           </button>
@@ -145,7 +148,7 @@ export default function AgencySearchPage() {
         {/* Tarjetas de Resultados (Lista Desktop / Grid Mobile) */}
         <div className="space-y-6">
           {mockResults.map((tour) => (
-            <div key={tour.id} className="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-sm hover:shadow-xl transition-all border border-slate-200/60 dark:border-slate-800/60">
+            <div key={tour.id} className="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-slate-200/60 dark:border-slate-800/60">
               
               {/* Imagen */}
               <div className="relative w-full md:w-72 h-56 md:h-auto overflow-hidden">
@@ -173,7 +176,7 @@ export default function AgencySearchPage() {
                   {tour.routeName}
                 </h3>
                 
-                <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400 font-medium mb-6">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600 dark:text-slate-400 font-medium mb-6">
                   <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {tour.duration}</span>
                   <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
                   <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Salida: {tour.date}</span>
@@ -193,8 +196,9 @@ export default function AgencySearchPage() {
                 <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mb-6">Comisión aplicable: 15%</p>
                 
                 <button 
+                  type="button"
                   onClick={() => setSelectedTour(tour)}
-                  className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 dark:bg-primary dark:hover:bg-blue-600 text-white font-bold rounded-xl transition-colors shadow-md"
+                  className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 dark:bg-primary dark:hover:bg-blue-600 text-white font-bold rounded-xl transition-all duration-300 ease-in-out shadow-md hover:scale-[1.02] active:scale-95"
                 >
                   Reservar / Bloquear
                 </button>

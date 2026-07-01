@@ -32,6 +32,7 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
         <div 
           className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden"
           onClick={onClose}
+          aria-hidden="true"
         />
       )}
 
@@ -40,7 +41,7 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
         glass-sidebar w-64 h-screen flex flex-col justify-between p-4 
         fixed md:sticky top-0 left-0 z-50
         transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        ${isOpen ? "visible translate-x-0" : "invisible md:visible -translate-x-full md:translate-x-0"}
       `}>
         <div>
           <div className="flex items-center justify-between px-2 py-4 mb-8">
@@ -50,7 +51,7 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
               </div>
               <span className="font-bold text-xl tracking-tight">Galápagos</span>
             </div>
-            <button onClick={onClose} className="md:hidden p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+            <button type="button" onClick={onClose} aria-label="Cerrar menú de navegación" className="md:hidden w-11 h-11 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
               <X className="w-6 h-6" />
             </button>
           </div>
@@ -63,6 +64,7 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
                   key={item.href}
                   href={item.href}
                   onClick={() => onClose()}
+                  aria-current={isActive ? "page" : undefined}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${
                     isActive 
                       ? "bg-primary text-white shadow-md shadow-primary/20" 
@@ -82,7 +84,7 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
           <Link 
             href="/" 
             onClick={onClose}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-colors w-full"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-all duration-300 ease-in-out active:scale-95 w-full"
           >
             <LogOut className="w-5 h-5" />
             <span className="font-medium">Cerrar Sesión</span>

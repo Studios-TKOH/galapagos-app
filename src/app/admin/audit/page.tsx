@@ -75,13 +75,13 @@ export default function AuditLogPage() {
       <div className="glass rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4">
         <div className="flex-1 w-full flex items-center px-4 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
           <Search className="w-5 h-5 text-slate-400 mr-2" />
-          <input type="text" placeholder="Buscar por usuario, acción o detalle..." className="w-full bg-transparent border-none outline-none text-sm text-slate-900 dark:text-white" />
+          <input type="search" aria-label="Buscar en el historial de auditoría" placeholder="Buscar por usuario, acción o detalle..." className="w-full bg-transparent border-none outline-none text-sm text-slate-900 dark:text-white" />
         </div>
         <div className="flex gap-2 w-full md:w-auto">
-          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+          <button type="button" className="min-h-11 flex-1 md:flex-none flex items-center justify-center gap-2 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300 ease-in-out active:scale-95">
             <Filter className="w-4 h-4" /> Filtros
           </button>
-          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 text-white dark:bg-primary rounded-xl text-sm font-bold hover:bg-slate-800 dark:hover:bg-blue-600 transition-colors">
+          <button type="button" className="min-h-11 flex-1 md:flex-none flex items-center justify-center gap-2 px-4 bg-slate-900 text-white dark:bg-primary rounded-xl text-sm font-bold hover:bg-slate-800 dark:hover:bg-blue-600 transition-all duration-300 ease-in-out active:scale-95">
             Exportar CSV
           </button>
         </div>
@@ -90,7 +90,7 @@ export default function AuditLogPage() {
       {/* Tabla de Auditoría (Timeline Style) */}
       <div className="glass rounded-3xl overflow-hidden border border-slate-200/60 dark:border-slate-800/60">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse" aria-label="Registro de acciones del sistema">
             <thead>
               <tr className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Acción</th>

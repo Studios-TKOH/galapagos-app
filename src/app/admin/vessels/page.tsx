@@ -50,7 +50,8 @@ export default function VesselsPage() {
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-primary/30"
+          type="button"
+          className="flex items-center justify-center gap-2 px-5 py-3 bg-primary text-white font-medium rounded-xl hover:bg-blue-600 transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95"
         >
           <Plus className="w-5 h-5" />
           Nueva Embarcación
@@ -98,7 +99,7 @@ export default function VesselsPage() {
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">
                       {vessel.name}
                     </h3>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase ${badgeColor}`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold tracking-wide uppercase ${badgeColor}`}>
                       {statusText}
                     </span>
                   </div>
@@ -121,11 +122,11 @@ export default function VesselsPage() {
 
               {/* Bloque 3: Acciones (Ocupa 3 columnas en desktop) */}
               <div className="sm:col-span-3 md:col-span-3 flex items-center justify-end gap-2 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
-                <button className="flex-1 sm:flex-none flex items-center justify-center p-2.5 px-4 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors">
+                <button type="button" aria-label={`Editar ${vessel.name}`} className="min-h-11 flex-1 sm:flex-none flex items-center justify-center px-4 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
                   <Edit2 className="w-4 h-4 mr-2" />
                   Editar
                 </button>
-                <button className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors">
+                <button type="button" aria-label={`Eliminar ${vessel.name}`} className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
                   <Trash2 className="w-5 h-5" />
                 </button>
               </div>

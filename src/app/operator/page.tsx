@@ -9,8 +9,8 @@ export default function OperatorDashboard() {
       
       {/* Saludo */}
       <div className="pt-2">
-        <h2 className="text-2xl font-black text-slate-900 dark:text-white">¡Hola, Capitán! 👋</h2>
-        <p className="text-slate-500 text-sm mt-1">Resumen operativo para el día de hoy.</p>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white">¡Hola, Capitán! 👋</h1>
+        <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Resumen operativo para el día de hoy.</p>
       </div>
 
       {/* Próximo Zarpe Destacado */}
@@ -49,7 +49,7 @@ export default function OperatorDashboard() {
 
           <Link 
             href="/operator/availability"
-            className="w-full py-3 bg-white text-blue-700 font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform"
+            className="w-full py-3 bg-white text-blue-700 font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-300 ease-in-out"
           >
             Actualizar Cupos <ArrowRight className="w-5 h-5" />
           </Link>
@@ -65,7 +65,7 @@ export default function OperatorDashboard() {
             <AlertTriangle className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-bold text-orange-800 dark:text-orange-300">Reserva Bloqueada a punto de expirar</p>
-              <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">La agencia 'Galapagos Dreams' tiene 4 cupos bloqueados que expiran en 30 minutos.</p>
+              <p className="text-xs text-orange-700 dark:text-orange-300 mt-1">La agencia &lsquo;Galapagos Dreams&rsquo; tiene 4 cupos bloqueados que expiran en 30 minutos.</p>
             </div>
           </div>
         </div>

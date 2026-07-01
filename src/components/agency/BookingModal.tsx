@@ -3,7 +3,14 @@
 import { X, Users, CreditCard, Clock } from "lucide-react";
 import { useState } from "react";
 
-export function BookingModal({ isOpen, onClose, tour }: { isOpen: boolean; onClose: () => void; tour: any }) {
+export type BookingTour = {
+  boatName: string;
+  routeName: string;
+  price: number;
+  availableSeats: number;
+};
+
+export function BookingModal({ isOpen, onClose, tour }: { isOpen: boolean; onClose: () => void; tour: BookingTour | null }) {
   const [passengers, setPassengers] = useState(2);
   const commissionRate = 0.15; // 15%
   
@@ -17,22 +24,24 @@ export function BookingModal({ isOpen, onClose, tour }: { isOpen: boolean; onClo
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+      <div role="dialog" aria-modal="true" aria-labelledby="booking-modal-title" className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-300 ease-out flex flex-col max-h-[90vh]">
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Resumen de la Reserva</h2>
+            <h2 id="booking-modal-title" className="text-xl font-bold text-slate-900 dark:text-white">Resumen de la Reserva</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{tour.boatName} - {tour.routeName}</p>
           </div>
           <button 
+            type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors bg-slate-100 dark:bg-slate-800"
+            aria-label="Cerrar resumen de reserva"
+            className="w-11 h-11 shrink-0 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-all duration-300 ease-in-out active:scale-95 bg-slate-100 dark:bg-slate-800"
           >
             <X className="w-5 h-5" />
           </button>
@@ -55,15 +64,19 @@ export function BookingModal({ isOpen, onClose, tour }: { isOpen: boolean; onClo
               </div>
               <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-900 p-1.5 rounded-xl border border-slate-100 dark:border-slate-700">
                 <button 
+                  type="button"
                   onClick={() => setPassengers(Math.max(1, passengers - 1))}
-                  className="w-10 h-10 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm font-bold text-lg hover:bg-slate-100 transition-colors"
+                  aria-label="Quitar un pasajero"
+                  className="w-11 h-11 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm font-bold text-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-300 ease-in-out active:scale-95"
                 >
                   -
                 </button>
                 <span className="w-6 text-center font-bold text-lg text-slate-900 dark:text-white">{passengers}</span>
                 <button 
+                  type="button"
                   onClick={() => setPassengers(Math.min(tour.availableSeats, passengers + 1))}
-                  className="w-10 h-10 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm font-bold text-lg hover:bg-slate-100 transition-colors"
+                  aria-label="Añadir un pasajero"
+                  className="w-11 h-11 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm font-bold text-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-300 ease-in-out active:scale-95"
                 >
                   +
                 </button>
@@ -72,10 +85,10 @@ export function BookingModal({ isOpen, onClose, tour }: { isOpen: boolean; onClo
             
             {/* Formulario rápido de pasajero principal */}
             <div className="space-y-3 pt-4">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Datos del Pasajero Principal</label>
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Datos del Pasajero Principal</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input type="text" placeholder="Nombres completos" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none" />
-                <input type="text" placeholder="Pasaporte / Cédula" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none" />
+                <input type="text" aria-label="Nombres completos del pasajero principal" autoComplete="name" placeholder="Nombres completos" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all" />
+                <input type="text" aria-label="Pasaporte o cédula del pasajero principal" placeholder="Pasaporte / Cédula" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none transition-all" />
               </div>
             </div>
           </div>
@@ -108,13 +121,15 @@ export function BookingModal({ isOpen, onClose, tour }: { isOpen: boolean; onClo
         {/* Footer Actions */}
         <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button 
-            className="flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-bold text-slate-700 dark:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
+            type="button"
+            className="flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-bold text-slate-700 dark:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all duration-300 ease-in-out active:scale-95"
           >
             <Clock className="w-5 h-5" />
             Bloquear (24h)
           </button>
           <button 
-            className="flex items-center justify-center px-6 py-3.5 text-sm font-bold text-white bg-primary hover:bg-blue-600 rounded-xl transition-all shadow-lg shadow-primary/30"
+            type="button"
+            className="flex items-center justify-center px-6 py-3.5 text-sm font-bold text-white bg-primary hover:bg-blue-600 rounded-xl transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95"
           >
             Confirmar Reserva
           </button>

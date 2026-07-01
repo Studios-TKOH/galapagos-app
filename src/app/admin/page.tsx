@@ -18,8 +18,8 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, i) => (
-          <div key={i} className="glass p-6 rounded-2xl relative overflow-hidden group">
+        {stats.map((stat) => (
+          <div key={stat.title} className="glass p-6 rounded-2xl relative overflow-hidden group transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-primary/5">
             <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.color} rounded-full blur-3xl opacity-10 group-hover:opacity-20 transition-opacity duration-500 translate-x-10 -translate-y-10`}></div>
             <div className="flex justify-between items-start mb-4">
               <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} text-white shadow-lg`}>
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <p className="font-medium text-sm text-slate-900 dark:text-white">Tour San Cristóbal 360</p>
-                  <p className="text-xs text-slate-500">Embarcación "Sea Wolf" • 8/12 cupos</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Embarcación &ldquo;Sea Wolf&rdquo; • 8/12 cupos</p>
                 </div>
               </div>
             ))}

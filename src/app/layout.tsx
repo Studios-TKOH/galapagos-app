@@ -8,7 +8,10 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Plataforma Galápagos",
+  title: {
+    default: "Galapagos System",
+    template: "%s | Galapagos System",
+  },
   description: "Gestión de disponibilidad y reservas",
 };
 

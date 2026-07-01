@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, ShieldCheck, Users, Calendar, Ship, MapPin } from "lucide-react";
+import { CheckCircle, ShieldCheck, Users, Calendar } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -19,9 +19,9 @@ export default function VerifyVoucherPage() {
 
   if (isValidating) {
     return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-slate-900 dark:bg-slate-950 flex flex-col items-center justify-center p-4" role="status" aria-live="polite">
         <div className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-6"></div>
-        <h2 className="text-xl font-bold text-white text-center">Verificando firma criptográfica...</h2>
+        <h1 className="text-xl font-bold text-white text-center">Verificando firma criptográfica...</h1>
         <p className="text-slate-400 mt-2 text-center text-sm">Validando QR con Galapagos System</p>
       </div>
     );
@@ -42,10 +42,10 @@ export default function VerifyVoucherPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-4 sm:p-6 font-sans">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-center p-4 sm:p-6 font-sans transition-colors duration-300">
       
       {/* Tarjeta Principal */}
-      <div className="w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden relative border border-slate-200">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl overflow-hidden relative border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-500 ease-out">
         
         {/* Banner de Estado (VERDE: Éxito) */}
         <div className="bg-emerald-500 p-8 text-center relative overflow-hidden flex flex-col items-center justify-center">
@@ -63,54 +63,54 @@ export default function VerifyVoucherPage() {
         </div>
 
         {/* Detalles del Pasajero (Alto Contraste) */}
-        <div className="p-6 pb-2 text-center border-b border-slate-100 border-dashed">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Pasajero Titular</p>
-          <h2 className="text-2xl font-black text-slate-900 leading-tight">{voucher.leadPassenger}</h2>
-          <p className="text-slate-500 font-medium mt-1">Pasaporte: {voucher.passport}</p>
+        <div className="p-6 pb-5 text-center border-b border-slate-100 dark:border-slate-800 border-dashed">
+          <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Pasajero Titular</p>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{voucher.leadPassenger}</h2>
+          <p className="text-slate-600 dark:text-slate-300 font-medium mt-1">Pasaporte: {voucher.passport}</p>
         </div>
 
         {/* Detalles del Tour (Grid) */}
-        <div className="p-6 bg-slate-50">
+        <div className="p-6 bg-slate-50 dark:bg-slate-900">
           
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-6 flex items-center gap-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 mb-6 flex items-center gap-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
             <div className="w-16 h-16 rounded-xl overflow-hidden relative shrink-0">
               <Image src={voucher.image} alt={voucher.boatName} fill className="object-cover" />
             </div>
             <div>
               <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-0.5">{voucher.boatName}</p>
-              <p className="font-bold text-slate-900 leading-tight">{voucher.routeName}</p>
+              <p className="font-bold text-slate-900 dark:text-white leading-tight">{voucher.routeName}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-              <Calendar className="w-5 h-5 text-slate-400 mb-2" />
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fecha y Hora</p>
-              <p className="font-bold text-slate-900 leading-tight mt-0.5">{voucher.date}</p>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-700">
+              <Calendar className="w-5 h-5 text-slate-500 dark:text-slate-400 mb-2" />
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Fecha y Hora</p>
+              <p className="font-bold text-slate-900 dark:text-white leading-tight mt-0.5">{voucher.date}</p>
               <p className="text-xs font-bold text-primary">{voucher.time}</p>
             </div>
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-              <Users className="w-5 h-5 text-slate-400 mb-2" />
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Personas</p>
-              <p className="text-3xl font-black text-slate-900 leading-none mt-1">{voucher.passengers}</p>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-700">
+              <Users className="w-5 h-5 text-slate-500 dark:text-slate-400 mb-2" />
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Total Personas</p>
+              <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mt-1">{voucher.passengers}</p>
             </div>
           </div>
         </div>
 
         {/* Info Operativa de Agencia */}
-        <div className="px-6 py-4 bg-white text-center">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Código de Reserva</p>
-          <p className="font-mono font-bold text-slate-800 tracking-wider">{voucher.id}</p>
-          <p className="text-xs text-slate-500 mt-2">Agencia Emisora: <span className="font-bold">{voucher.agency}</span></p>
+        <div className="px-6 py-4 bg-white dark:bg-slate-900 text-center">
+          <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Código de Reserva</p>
+          <p className="font-mono font-bold text-slate-800 dark:text-slate-100 tracking-wider">{voucher.id}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">Agencia Emisora: <span className="font-bold">{voucher.agency}</span></p>
         </div>
       </div>
 
       {/* Sello Criptográfico de Seguridad */}
-      <div className="mt-8 flex items-center justify-center gap-2 text-slate-400">
+      <div className="mt-8 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400">
         <ShieldCheck className="w-4 h-4" />
         <span className="text-xs font-medium uppercase tracking-widest">Verificado Criptográficamente</span>
       </div>
-      <p className="text-[10px] text-slate-400 mt-1 font-mono text-center opacity-50">
+      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono text-center opacity-70">
         UID: 0x8f2d...9a1b • Emisión: SECURE_QR
       </p>
 

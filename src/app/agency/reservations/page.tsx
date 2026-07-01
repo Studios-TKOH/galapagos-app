@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Clock, CheckCircle2, Download, CreditCard, ChevronRight, Anchor, FileText } from "lucide-react";
+import { Search, Clock, CheckCircle2, Download, CreditCard, Anchor, FileText, XCircle } from "lucide-react";
 
 // Mock data para las reservas
 const mockReservations = [
@@ -53,7 +53,7 @@ export default function AgencyReservationsPage() {
         </div>
         <Link 
           href="/agency"
-          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm"
+          className="flex items-center justify-center gap-2 px-5 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300 ease-in-out shadow-sm hover:scale-[1.02] active:scale-95"
         >
           <Search className="w-5 h-5" />
           Nueva Búsqueda
@@ -65,7 +65,7 @@ export default function AgencyReservationsPage() {
         {mockReservations.map((res) => (
           <div 
             key={res.id} 
-            className="glass rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center gap-6 transition-all border border-slate-200/60 dark:border-slate-800/60 shadow-sm hover:shadow-lg dark:hover:shadow-primary/5"
+            className="glass rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center gap-6 transition-all duration-300 ease-in-out border border-slate-200/60 dark:border-slate-800/60 shadow-sm hover:-translate-y-0.5 hover:shadow-lg dark:hover:shadow-primary/5"
           >
             
             {/* Indicador de Estado y Código */}
@@ -87,8 +87,8 @@ export default function AgencyReservationsPage() {
                   </span>
                 )}
                 {res.status === 'cancelled' && (
-                  <span className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 flex items-center gap-1.5">
-                    Cancelada
+                  <span className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 flex items-center gap-1.5">
+                    <XCircle className="w-4 h-4" /> Cancelada
                   </span>
                 )}
               </div>
@@ -125,17 +125,17 @@ export default function AgencyReservationsPage() {
 
               <div className="w-full">
                 {res.status === 'confirmed' && (
-                  <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40 rounded-xl transition-colors">
+                  <button type="button" className="w-full min-h-11 flex items-center justify-center gap-2 px-4 text-sm font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
                     <Download className="w-4 h-4" /> Voucher
                   </button>
                 )}
                 {res.status === 'blocked' && (
-                  <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-primary hover:bg-blue-600 rounded-xl transition-all shadow-md">
+                  <button type="button" className="w-full min-h-11 flex items-center justify-center gap-2 px-4 text-sm font-bold text-white bg-primary hover:bg-blue-600 rounded-xl transition-all duration-300 ease-in-out shadow-md active:scale-95">
                     <CreditCard className="w-4 h-4" /> Pagar Ahora
                   </button>
                 )}
                 {res.status === 'cancelled' && (
-                  <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl transition-colors">
+                  <button type="button" className="w-full min-h-11 flex items-center justify-center gap-2 px-4 text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
                     <FileText className="w-4 h-4" /> Detalles
                   </button>
                 )}

@@ -21,7 +21,7 @@ export default function LoginPage() {
       </div>
 
       {/* Tarjeta de Login (Glassmorphism) */}
-      <div className="relative z-10 w-full max-w-md animate-in fade-in zoom-in duration-500">
+      <div className="relative z-10 w-full max-w-md animate-in fade-in zoom-in-95 duration-500 ease-out">
         <div className="glass bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-8 sm:p-10 rounded-[2rem] shadow-2xl shadow-black/50">
           
           {/* Logo y Encabezado */}
@@ -36,11 +36,13 @@ export default function LoginPage() {
           {/* Formulario */}
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-200 ml-1">Correo Electrónico</label>
+              <label htmlFor="login-email" className="text-sm font-medium text-slate-200 ml-1">Correo Electrónico</label>
               <div className="relative">
                 <Mail className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input 
+                  id="login-email"
                   type="email" 
+                  autoComplete="email"
                   placeholder="admin@galapagos.com"
                   className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/20 bg-white/5 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary focus:bg-white/10 outline-none transition-all"
                 />
@@ -49,13 +51,15 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between ml-1">
-                <label className="text-sm font-medium text-slate-200">Contraseña</label>
-                <a href="#" className="text-xs text-primary hover:text-blue-400 transition-colors">¿Olvidaste tu clave?</a>
+                <label htmlFor="login-password" className="text-sm font-medium text-slate-200">Contraseña</label>
+                <a href="#" className="inline-flex min-h-11 items-center text-xs font-medium text-sky-300 hover:text-sky-200 transition-colors">¿Olvidaste tu clave?</a>
               </div>
               <div className="relative">
                 <Key className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input 
+                  id="login-password"
                   type="password" 
+                  autoComplete="current-password"
                   placeholder="••••••••"
                   className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/20 bg-white/5 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary focus:bg-white/10 outline-none transition-all"
                 />
@@ -64,7 +68,7 @@ export default function LoginPage() {
 
             <Link 
               href="/admin"
-              className="group flex items-center justify-center gap-2 w-full py-4 mt-8 bg-primary hover:bg-blue-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-primary/30"
+              className="group flex items-center justify-center gap-2 w-full py-4 mt-8 bg-primary hover:bg-blue-600 text-white font-bold rounded-xl transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95"
             >
               Iniciar Sesión
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

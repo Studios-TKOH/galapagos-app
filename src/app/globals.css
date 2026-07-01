@@ -7,6 +7,7 @@
   --sidebar-bg: #ffffff;
   --card-bg: #ffffff;
   --border: #e2e8f0;
+  color-scheme: light dark;
 }
 
 @theme inline {
@@ -34,6 +35,31 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
   -webkit-font-smoothing: antialiased;
+  min-width: 320px;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a[href] {
+  transition-duration: 300ms;
+  transition-timing-function: ease-in-out;
+}
+
+button:not(:disabled):active,
+a[href]:active {
+  transform: scale(0.97);
+}
+
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 65%, white);
+  outline-offset: 3px;
 }
 
 /* Glassmorphism Utilities */
@@ -49,4 +75,19 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-right: 1px solid var(--border);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

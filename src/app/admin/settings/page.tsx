@@ -21,7 +21,7 @@ export default function SettingsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Configuración</h1>
           <p className="text-slate-500 dark:text-slate-400">Administra los ajustes globales de la plataforma.</p>
         </div>
-        <button className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-primary/30">
+        <button type="button" className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-medium rounded-xl hover:bg-blue-600 transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95">
           <Save className="w-5 h-5" />
           Guardar Cambios
         </button>
@@ -31,14 +31,16 @@ export default function SettingsPage() {
         
         {/* Sidebar de Navegación de Configuración */}
         <div className="w-full md:w-64 shrink-0">
-          <nav className="flex md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+          <nav aria-label="Secciones de configuración" className="grid grid-cols-3 md:flex md:flex-col gap-1 sm:gap-2 pb-2 md:pb-0">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
+                  type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 whitespace-nowrap ${
+                  aria-pressed={isActive}
+                  className={`min-w-0 flex items-center justify-center md:justify-start gap-1.5 sm:gap-3 px-2 sm:px-4 py-3 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ease-in-out active:scale-95 ${
                     isActive 
                       ? "bg-white dark:bg-slate-800 text-primary shadow-sm ring-1 ring-slate-200 dark:ring-slate-700" 
                       : "text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white"
@@ -62,24 +64,27 @@ export default function SettingsPage() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Nombre Comercial</label>
+                    <label htmlFor="business-name" className="text-sm font-medium text-slate-700 dark:text-slate-300">Nombre Comercial</label>
                     <input 
+                      id="business-name"
                       type="text" 
                       defaultValue="Galápagos Platform"
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-slate-900 outline-none transition-all"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Correo Principal</label>
+                    <label htmlFor="business-email" className="text-sm font-medium text-slate-700 dark:text-slate-300">Correo Principal</label>
                     <input 
+                      id="business-email"
                       type="email" 
                       defaultValue="contacto@empresa.com"
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-slate-900 outline-none transition-all"
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Dirección</label>
+                    <label htmlFor="business-address" className="text-sm font-medium text-slate-700 dark:text-slate-300">Dirección</label>
                     <input 
+                      id="business-address"
                       type="text" 
                       defaultValue="Puerto Ayora, Isla Santa Cruz, Galápagos"
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-slate-900 outline-none transition-all"
@@ -94,15 +99,15 @@ export default function SettingsPage() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Zona Horaria</label>
-                    <select className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-slate-900 outline-none transition-all">
+                    <label htmlFor="timezone" className="text-sm font-medium text-slate-700 dark:text-slate-300">Zona Horaria</label>
+                    <select id="timezone" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-slate-900 outline-none transition-all">
                       <option>(GMT-06:00) Galápagos</option>
                       <option>(GMT-05:00) Ecuador Continental</option>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Moneda Base</label>
-                    <select className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-slate-900 outline-none transition-all">
+                    <label htmlFor="currency" className="text-sm font-medium text-slate-700 dark:text-slate-300">Moneda Base</label>
+                    <select id="currency" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-slate-900 outline-none transition-all">
                       <option>USD ($) - Dólar Estadounidense</option>
                     </select>
                   </div>
@@ -131,7 +136,7 @@ export default function SettingsPage() {
                   {/* Toggle Switch */}
                   <div className="shrink-0">
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" value="" className="sr-only peer" defaultChecked />
+                      <input type="checkbox" value="" aria-label="Activar servicio de WhatsApp" className="sr-only peer" defaultChecked />
                       <div className="w-14 h-7 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 dark:peer-focus:ring-emerald-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-500"></div>
                       <span className="ml-3 text-sm font-medium text-slate-900 dark:text-slate-300 sr-only">Toggle WhatsApp</span>
                     </label>
@@ -147,7 +152,7 @@ export default function SettingsPage() {
                     <p className="font-medium text-slate-900 dark:text-white">Nueva Reserva Confirmada</p>
                     <p className="text-xs text-slate-500">Envía el voucher en PDF a la agencia.</p>
                   </div>
-                  <input type="checkbox" className="w-5 h-5 rounded text-primary focus:ring-primary accent-primary" defaultChecked />
+                  <input type="checkbox" aria-label="Notificar nueva reserva confirmada" className="w-5 h-5 rounded text-primary focus:ring-primary accent-primary" defaultChecked />
                 </div>
 
                 <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-800">
@@ -155,7 +160,7 @@ export default function SettingsPage() {
                     <p className="font-medium text-slate-900 dark:text-white">Alerta a Embarcación</p>
                     <p className="text-xs text-slate-500">Avisa al dueño del barco que un cupo ha sido tomado.</p>
                   </div>
-                  <input type="checkbox" className="w-5 h-5 rounded text-primary focus:ring-primary accent-primary" defaultChecked />
+                  <input type="checkbox" aria-label="Notificar alerta a embarcación" className="w-5 h-5 rounded text-primary focus:ring-primary accent-primary" defaultChecked />
                 </div>
               </div>
             </div>
@@ -169,28 +174,32 @@ export default function SettingsPage() {
                 
                 <div className="space-y-4 max-w-md">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Contraseña Actual</label>
+                    <label htmlFor="current-password" className="text-sm font-medium text-slate-700 dark:text-slate-300">Contraseña Actual</label>
                     <div className="relative">
                       <Key className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                       <input 
+                        id="current-password"
                         type="password" 
+                        autoComplete="current-password"
                         placeholder="••••••••"
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-slate-900 outline-none transition-all"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Nueva Contraseña</label>
+                    <label htmlFor="new-password" className="text-sm font-medium text-slate-700 dark:text-slate-300">Nueva Contraseña</label>
                     <div className="relative">
                       <Key className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                       <input 
+                        id="new-password"
                         type="password" 
+                        autoComplete="new-password"
                         placeholder="Mínimo 8 caracteres"
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-slate-900 outline-none transition-all"
                       />
                     </div>
                   </div>
-                  <button className="w-full py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-medium rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors mt-2">
+                  <button type="button" className="w-full min-h-11 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-medium rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all duration-300 ease-in-out active:scale-95 mt-2">
                     Actualizar Contraseña
                   </button>
                 </div>
