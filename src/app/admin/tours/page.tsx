@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Plus, Clock, DollarSign, Edit2, Trash2, Image as ImageIcon, CheckCircle2, CircleOff } from "lucide-react";
 import { TourFormModal } from "@/components/admin/TourFormModal";
 
-// Mock data para las rutas
 const mockTours = [
   {
     id: 1,
@@ -40,89 +39,82 @@ export default function ToursPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="mx-auto max-w-7xl space-y-7 py-1 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Rutas y Tours</h1>
-          <p className="text-slate-500 dark:text-slate-400">Gestiona el catálogo de viajes disponibles.</p>
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--primary)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+            Catálogo
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Rutas y Tours</h1>
+          <p className="mt-1 text-sm text-slate-500">Gestiona las experiencias disponibles para tus pasajeros.</p>
         </div>
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           type="button"
-          className="flex items-center justify-center gap-2 px-5 py-3 bg-primary text-white font-medium rounded-xl hover:bg-blue-600 transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#0b7f8c] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#0b7f8c]/20 transition-all hover:-translate-y-0.5 hover:bg-[#086874] hover:shadow-xl"
         >
-          <Plus className="w-5 h-5" />
-          Nueva Ruta
+          <Plus className="h-5 w-5" />
+          Nueva ruta
         </button>
+      </section>
+
+      <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+        <p className="text-sm font-medium text-slate-600"><span className="font-bold text-slate-900">{mockTours.length}</span> experiencias en catálogo</p>
+        <span className="text-xs text-slate-400">Actualizado recientemente</span>
       </div>
 
-      {/* Grid de Tarjetas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+      <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         {mockTours.map((tour) => (
-          <div key={tour.id} className="glass rounded-2xl overflow-hidden group flex flex-col transition-all hover:shadow-xl dark:hover:shadow-primary/5 hover:-translate-y-1">
-            
-            {/* Imagen del Tour */}
-            <div className="relative h-48 w-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+          <article key={tour.id} className="group flex flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-[0_8px_30px_rgba(16,42,67,0.05)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(16,42,67,0.1)]">
+            <div className="relative h-48 w-full overflow-hidden bg-slate-100">
               {tour.image ? (
-                <Image
-                  src={tour.image} 
-                  alt={tour.name} 
-                  fill
-                  sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                <Image src={tour.image} alt={tour.name} fill sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-400">
-                  <ImageIcon className="w-12 h-12 opacity-50" />
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-[#e5f5f6] text-slate-300">
+                  <ImageIcon className="h-12 w-12" />
                 </div>
               )}
-              
-              {/* Badge Estado */}
-              <div className="absolute top-4 left-4">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md shadow-sm inline-flex items-center gap-1.5 ${
-                  tour.active 
-                    ? "bg-emerald-500/90 text-white" 
-                    : "bg-slate-500/90 text-white"
-                }`}>
-                  {tour.active ? <><CheckCircle2 className="w-3.5 h-3.5" /> Activo</> : <><CircleOff className="w-3.5 h-3.5" /> Inactivo</>}
+              <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-950/45 to-transparent" />
+              <div className="absolute left-4 top-4">
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold shadow-sm backdrop-blur-md ${tour.active ? "bg-white/95 text-emerald-700" : "bg-slate-800/85 text-white"}`}>
+                  {tour.active ? <CheckCircle2 className="h-3.5 w-3.5" /> : <CircleOff className="h-3.5 w-3.5" />}
+                  {tour.active ? "Activo" : "Inactivo"}
                 </span>
+              </div>
+              <div className="absolute bottom-3 left-4 text-white">
+                <span className="text-xs font-medium text-white/80">Experiencia turística</span>
               </div>
             </div>
 
-            {/* Contenido de la Tarjeta */}
-            <div className="p-5 flex-1 flex flex-col">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{tour.name}</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 flex-1">
-                {tour.description}
-              </p>
-              
-              <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-300 mb-6">
+            <div className="flex flex-1 flex-col p-5">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900">{tour.name}</h2>
+              <p className="mt-2 line-clamp-2 flex-1 text-sm leading-6 text-slate-500">{tour.description}</p>
+
+              <div className="mt-5 flex items-center gap-5 border-t border-slate-100 pt-4 text-sm text-slate-600">
                 <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-primary" />
+                  <Clock className="h-4 w-4 text-[#0b7f8c]" />
                   <span>{tour.duration}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <DollarSign className="w-4 h-4 text-emerald-500" />
-                  <span className="font-bold">${tour.price.toFixed(2)}</span>
+                  <DollarSign className="h-4 w-4 text-emerald-600" />
+                  <span className="font-bold text-slate-800">${tour.price.toFixed(2)}</span>
                 </div>
               </div>
 
-              {/* Botones de Acción */}
-              <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
-                <button type="button" aria-label={`Editar ${tour.name}`} className="min-h-11 flex-1 flex items-center justify-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
-                  <Edit2 className="w-4 h-4" />
+              <div className="mt-4 flex gap-2">
+                <button type="button" aria-label={`Editar ${tour.name}`} className="min-h-10 flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-50 text-sm font-semibold text-slate-600 transition-colors hover:bg-[#e5f5f6] hover:text-[#0b7f8c]">
+                  <Edit2 className="h-4 w-4" />
                   Editar
                 </button>
-                <button type="button" aria-label={`Eliminar ${tour.name}`} className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
-                  <Trash2 className="w-5 h-5" />
+                <button type="button" aria-label={`Eliminar ${tour.name}`} className="h-10 w-10 shrink-0 inline-flex items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500">
+                  <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             </div>
-          </div>
+          </article>
         ))}
-      </div>
+      </section>
 
       <TourFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
