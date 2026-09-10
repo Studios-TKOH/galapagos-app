@@ -12,11 +12,11 @@ export default function AdminLayout({
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-[#0b0f19]">
+    <div className="flex h-screen overflow-hidden bg-[var(--background)]">
       <Sidebar isOpen={isMobileOpen} onClose={() => setIsMobileOpen(false)} />
-      <div className="flex-1 flex flex-col relative overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header onMenuClick={() => setIsMobileOpen(true)} />
-        <main className="flex-1 overflow-y-auto px-4 md:px-6 pb-6">
+        <main className="flex-1 overflow-y-auto px-4 pb-8 pt-1 md:px-6 lg:px-8">
           {children}
         </main>
       </div>
