@@ -5,23 +5,20 @@ export type AppRole = "admin" | "agency" | "operator";
 
 export async function requireRole(allowedRoles: AppRole[]) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const userId = data?.claims?.sub;
 
-  if (!user) {
-    redirect("/");
-  }
+  if (!userId) redirect("/");
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("role_id, roles(name)")
-    .eq("id", user.id)
+    .eq("id", userId)
     .maybeSingle();
 
   const role = (profile?.roles as { name?: string } | null)?.name;
 
-  if (!role || !allowedRoles.includes(role as AppRole)) {
-    redirect("/");
-  }
+  if (!role || !allowedRoles.includes(role as AppRole)) redirect("/");
 
-  return { user, role: role as AppRole };
+  return { userId, role: role as AppRole };
 }
