@@ -30,6 +30,10 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -48,6 +52,7 @@ textarea {
 
 button:not(:disabled),
 a[href] {
+  transition-property: color, background-color, border-color, opacity, box-shadow, transform;
   transition-duration: 300ms;
   transition-timing-function: ease-in-out;
 }
