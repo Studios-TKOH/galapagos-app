@@ -6,81 +6,49 @@ import Image from "next/image";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
-      {/* Imagen de fondo a pantalla completa */}
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4 sm:p-6">
       <div className="absolute inset-0 z-0">
-        <Image
-          src="https://images.unsplash.com/photo-1549449830-4e3edce6c1a8?q=80&w=2072&auto=format&fit=crop"
-          alt="Galapagos Background"
-          fill
-          className="object-cover"
-          priority
-        />
-        {/* Overlay oscuro para legibilidad */}
-        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px]"></div>
+        <Image src="https://images.unsplash.com/photo-1549449830-4e3edce6c1a8?q=80&w=2072&auto=format&fit=crop" alt="Galápagos" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-slate-950/60" />
       </div>
 
-      {/* Tarjeta de Login (Glassmorphism) */}
-      <div className="relative z-10 w-full max-w-md animate-in fade-in zoom-in-95 duration-500 ease-out">
-        <div className="glass bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-8 sm:p-10 rounded-[2rem] shadow-2xl shadow-black/50">
-          
-          {/* Logo y Encabezado */}
-          <div className="flex flex-col items-center text-center mb-10">
-            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-primary/30">
-              <Ship className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Bienvenido</h1>
-            <p className="text-slate-300">Plataforma de Gestión y Reservas</p>
+      <div className="relative z-10 w-full max-w-md">
+        <div className="rounded-[30px] border border-white/20 bg-white/95 p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-9">
+          <div className="mb-8 flex flex-col items-center text-center">
+            <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white shadow-xl shadow-teal-900/20">
+              <Ship className="h-8 w-8" />
+            </span>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--primary)]">Galápagos System</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Bienvenido</h1>
+            <p className="mt-2 text-sm text-slate-500">Plataforma de gestión y reservas</p>
           </div>
 
-          {/* Formulario */}
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div className="space-y-2">
-              <label htmlFor="login-email" className="text-sm font-medium text-slate-200 ml-1">Correo Electrónico</label>
+              <label htmlFor="login-email" className="ml-1 text-sm font-semibold text-slate-700">Correo electrónico</label>
               <div className="relative">
-                <Mail className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                  id="login-email"
-                  type="email" 
-                  autoComplete="email"
-                  placeholder="admin@galapagos.com"
-                  className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/20 bg-white/5 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary focus:bg-white/10 outline-none transition-all"
-                />
+                <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input id="login-email" type="email" autoComplete="email" placeholder="admin@galapagos.com" className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-[var(--primary)] focus:bg-white focus:ring-2 focus:ring-teal-100" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between ml-1">
-                <label htmlFor="login-password" className="text-sm font-medium text-slate-200">Contraseña</label>
-                <a href="#" className="inline-flex min-h-11 items-center text-xs font-medium text-sky-300 hover:text-sky-200 transition-colors">¿Olvidaste tu clave?</a>
+              <div className="flex items-center justify-between gap-3">
+                <label htmlFor="login-password" className="ml-1 text-sm font-semibold text-slate-700">Contraseña</label>
+                <a href="#" className="inline-flex min-h-11 items-center text-xs font-semibold text-[var(--primary)] transition hover:text-[var(--primary-strong)]">¿Olvidaste tu clave?</a>
               </div>
               <div className="relative">
-                <Key className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                  id="login-password"
-                  type="password" 
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/20 bg-white/5 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary focus:bg-white/10 outline-none transition-all"
-                />
+                <Key className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input id="login-password" type="password" autoComplete="current-password" placeholder="••••••••" className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-[var(--primary)] focus:bg-white focus:ring-2 focus:ring-teal-100" />
               </div>
             </div>
 
-            <Link 
-              href="/admin"
-              className="group flex items-center justify-center gap-2 w-full py-4 mt-8 bg-primary hover:bg-blue-600 text-white font-bold rounded-xl transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95"
-            >
-              Iniciar Sesión
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <Link href="/admin" className="group mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--primary)] py-4 font-bold text-white shadow-lg shadow-teal-900/15 transition hover:-translate-y-0.5 hover:bg-[var(--primary-strong)] active:scale-[0.98]">
+              Iniciar sesión <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-          
         </div>
-        
-        {/* Footer info */}
-        <p className="text-center text-sm text-slate-400 mt-8">
-          © 2026 Galapagos Booking System.
-        </p>
+        <p className="mt-6 text-center text-xs font-medium text-white/75">© 2026 Galápagos System · Gestión y reservas</p>
       </div>
     </div>
   );
