@@ -1,41 +1,50 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --primary: #0ea5e9;
-  --sidebar-bg: #ffffff;
-  --card-bg: #ffffff;
-  --border: #e2e8f0;
-  color-scheme: light dark;
+  --background: #f4f8fa;
+  --foreground: #102a43;
+  --primary: #0b7f8c;
+  --primary-strong: #086874;
+  --accent: #22b8a7;
+  --sidebar-bg: rgba(255, 255, 255, 0.94);
+  --card-bg: rgba(255, 255, 255, 0.92);
+  --border: #dce8ec;
+  --muted: #607d8b;
+  color-scheme: light;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-accent: var(--accent);
   --color-sidebar-bg: var(--sidebar-bg);
   --color-card-bg: var(--card-bg);
   --color-border: var(--border);
   --font-sans: var(--font-outfit);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b0f19;
-    --foreground: #f1f5f9;
-    --sidebar-bg: rgba(17, 24, 39, 0.7);
-    --card-bg: rgba(30, 41, 59, 0.6);
-    --border: rgba(255, 255, 255, 0.1);
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+  scroll-behavior: smooth;
 }
 
 body {
-  background-color: var(--background);
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(34, 184, 167, 0.08), transparent 28rem),
+    radial-gradient(circle at 0% 100%, rgba(11, 127, 140, 0.06), transparent 30rem),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
   -webkit-font-smoothing: antialiased;
-  min-width: 320px;
+  text-rendering: optimizeLegibility;
 }
 
 button,
@@ -48,37 +57,49 @@ textarea {
 
 button:not(:disabled),
 a[href] {
-  transition-duration: 300ms;
-  transition-timing-function: ease-in-out;
+  transition-duration: 200ms;
+  transition-timing-function: ease-out;
 }
 
 button:not(:disabled):active,
 a[href]:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 :where(button, a, input, select, textarea):focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--primary) 65%, white);
-  outline-offset: 3px;
+  outline: 3px solid color-mix(in srgb, var(--accent) 45%, white);
+  outline-offset: 2px;
 }
 
-/* Glassmorphism Utilities */
+::selection {
+  background: color-mix(in srgb, var(--accent) 24%, white);
+  color: var(--foreground);
+}
+
 .glass {
   background: var(--card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--border);
+  box-shadow: 0 12px 35px rgba(16, 42, 67, 0.06);
 }
 
 .glass-sidebar {
   background: var(--sidebar-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-right: 1px solid var(--border);
+  box-shadow: 8px 0 30px rgba(16, 42, 67, 0.04);
 }
 
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (max-width: 767px) {
+  .glass-sidebar {
+    box-shadow: 18px 0 50px rgba(16, 42, 67, 0.16);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
