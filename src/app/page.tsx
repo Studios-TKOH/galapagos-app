@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { Ship, Mail, Key, ArrowRight } from "lucide-react";
-import Image from "next/image";
 
 export default function LoginPage() {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4 sm:p-6">
-      <div className="absolute inset-0 z-0">
-        <Image src="https://images.unsplash.com/photo-1549449830-4e3edce6c1a8?q=80&w=2072&auto=format&fit=crop" alt="Galápagos" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-slate-950/60" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 p-4 sm:p-6">
+      <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute -left-24 -top-32 h-[34rem] w-[34rem] rounded-full bg-cyan-500/15 blur-3xl" />
+        <div className="absolute -bottom-40 -right-32 h-[38rem] w-[38rem] rounded-full bg-teal-400/10 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(14,165,233,0.14),transparent_34%),radial-gradient(circle_at_50%_100%,rgba(20,184,166,0.12),transparent_38%)]" />
+        <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:56px_56px]" />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
