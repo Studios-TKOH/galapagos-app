@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Map, 
-  Ship, 
-  Building2, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Map,
+  Ship,
+  Building2,
+  Settings,
   LogOut,
   X,
-  History
+  History,
+  Waves,
 } from "lucide-react";
 
 const navItems = [
@@ -27,33 +28,44 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden"
+        <div
+          className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-sm md:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
-      {/* Sidebar Content */}
-      <aside className={`
-        glass-sidebar w-64 h-screen flex flex-col justify-between p-4 
-        fixed md:sticky top-0 left-0 z-50
-        transition-transform duration-300 ease-in-out
-        ${isOpen ? "visible translate-x-0" : "invisible md:visible -translate-x-full md:translate-x-0"}
-      `}>
+      <aside
+        className={`glass-sidebar fixed left-0 top-0 z-50 flex h-screen w-[272px] flex-col justify-between p-4 transition-transform duration-300 ease-out md:sticky ${
+          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+        aria-label="Navegación principal"
+      >
         <div>
-          <div className="flex items-center justify-between px-2 py-4 mb-8">
+          <div className="mb-7 flex items-center justify-between px-2 py-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-blue-400 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/30">
-                G
+              <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary to-accent text-white shadow-lg shadow-primary/20">
+                <Waves className="h-6 w-6" strokeWidth={2.2} />
+                <span className="absolute -bottom-2 -right-1 h-5 w-5 rounded-full bg-white/15" />
               </div>
-              <span className="font-bold text-xl tracking-tight">Galápagos</span>
+              <div>
+                <span className="block text-[15px] font-extrabold tracking-tight text-slate-900">Galápagos</span>
+                <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">System</span>
+              </div>
             </div>
-            <button type="button" onClick={onClose} aria-label="Cerrar menú de navegación" className="md:hidden w-11 h-11 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
-              <X className="w-6 h-6" />
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Cerrar menú de navegación"
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 md:hidden"
+            >
+              <X className="h-5 w-5" />
             </button>
+          </div>
+
+          <div className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+            Gestión
           </div>
 
           <nav className="space-y-1.5">
@@ -63,31 +75,46 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => onClose()}
+                  onClick={onClose}
                   aria-current={isActive ? "page" : undefined}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${
-                    isActive 
-                      ? "bg-primary text-white shadow-md shadow-primary/20" 
-                      : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  className={`group relative flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-200 ${
+                    isActive
+                      ? "bg-primary text-white shadow-md shadow-primary/20"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
                   }`}
                 >
-                  <item.icon className={`w-5 h-5 transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`} />
-                  <span className="font-medium text-sm">{item.name}</span>
+                  {isActive && <span className="absolute left-0 h-6 w-1 rounded-r-full bg-accent" />}
+                  <item.icon
+                    className={`h-[19px] w-[19px] transition-transform duration-200 ${
+                      isActive ? "scale-105" : "group-hover:scale-105"
+                    }`}
+                  />
+                  <span className="text-sm font-semibold">{item.name}</span>
                 </Link>
               );
             })}
           </nav>
         </div>
 
-        {/* Footer / Logout */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800">
-          <Link 
-            href="/" 
+        <div className="border-t border-slate-200/80 pt-4">
+          <div className="mb-3 rounded-2xl bg-slate-50 px-3 py-3">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-xs font-bold text-primary">
+                GS
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-xs font-bold text-slate-800">Galápagos System</p>
+                <p className="text-[10px] text-slate-400">Panel administrativo</p>
+              </div>
+            </div>
+          </div>
+          <Link
+            href="/"
             onClick={onClose}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-all duration-300 ease-in-out active:scale-95 w-full"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-500 hover:bg-red-50 hover:text-red-600"
           >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Cerrar Sesión</span>
+            <LogOut className="h-[19px] w-[19px]" />
+            <span>Cerrar Sesión</span>
           </Link>
         </div>
       </aside>
