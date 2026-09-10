@@ -6,7 +6,6 @@ import { Search, Calendar, MapPin, Users, Filter, Clock, Ship, CheckCircle2 } fr
 import { BookingModal } from "@/components/agency/BookingModal";
 import type { BookingTour } from "@/components/agency/BookingModal";
 
-// Mock data para los resultados de búsqueda
 const mockResults = [
   {
     id: 1,
@@ -34,38 +33,32 @@ export default function AgencySearchPage() {
   const [selectedTour, setSelectedTour] = useState<BookingTour | null>(null);
   const [dateSearch, setDateSearch] = useState("");
 
-  // Máscara inteligente con validación básica de Día (max 31) y Mes (max 12)
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, ""); // Solo números
-    
-    // Validar Día
+    let value = e.target.value.replace(/\D/g, "");
+
     if (value.length >= 1) {
-      if (value.length === 1 && parseInt(value[0]) > 3) value = "0" + value; // Si empieza con 4-9, poner 0 antes
+      if (value.length === 1 && parseInt(value[0]) > 3) value = "0" + value;
       if (value.length >= 2 && parseInt(value.slice(0, 2)) > 31) value = "31" + value.slice(2);
     }
-    
-    // Validar Mes
+
     if (value.length >= 3) {
-      if (value.length === 3 && parseInt(value[2]) > 1) value = value.slice(0, 2) + "0" + value.slice(2); // Si mes empieza con 2-9
+      if (value.length === 3 && parseInt(value[2]) > 1) value = value.slice(0, 2) + "0" + value.slice(2);
       if (value.length >= 4 && parseInt(value.slice(2, 4)) > 12) value = value.slice(0, 2) + "12" + value.slice(4);
     }
 
     if (value.length > 8) value = value.slice(0, 8);
-    
-    // Formatear con barras
+
     if (value.length > 4) {
       value = `${value.slice(0, 2)}/${value.slice(2, 4)}/${value.slice(4)}`;
     } else if (value.length > 2) {
       value = `${value.slice(0, 2)}/${value.slice(2)}`;
     }
-    
+
     setDateSearch(value);
   };
 
-  // Cuando el usuario usa el calendario nativo del navegador
   const handleNativeDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
-      // El navegador devuelve YYYY-MM-DD
       const [year, month, day] = e.target.value.split("-");
       setDateSearch(`${day}/${month}/${year}`);
     }
@@ -73,147 +66,92 @@ export default function AgencySearchPage() {
 
   return (
     <div className="w-full">
-      {/* Hero Header con Buscador */}
-      <div className="relative pt-16 pb-32 flex flex-col items-center justify-center text-center px-4">
+      <div className="relative flex flex-col items-center justify-center px-4 pb-32 pt-16 text-center">
         <div className="absolute inset-0 z-0">
           <Image
             src="https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=2070&auto=format&fit=crop"
-            alt="Hero Galapagos"
+            alt="Paisaje de Galápagos"
             fill
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"></div>
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]" />
         </div>
 
         <div className="relative z-10 w-full max-w-4xl space-y-6">
-          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight drop-shadow-lg">
-            Encuentra la ruta perfecta.
-          </h1>
-          <p className="text-lg text-slate-200 font-medium">Búsqueda de cupos y disponibilidad en tiempo real.</p>
-          
-          {/* Barra de Búsqueda Flotante */}
-          <div className="mt-8 bg-white dark:bg-slate-900 rounded-3xl p-3 shadow-2xl flex flex-col md:flex-row items-center gap-3 w-full">
-            <div className="flex-1 w-full flex items-center px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl relative">
-              <MapPin className="w-5 h-5 text-primary mr-3 shrink-0" />
-              <input type="text" aria-label="Destino" placeholder="¿A dónde?" className="bg-transparent border-none outline-none w-full text-slate-900 dark:text-white font-medium placeholder:text-slate-500" />
-            </div>
-            
-            <div className="w-full md:w-48 flex items-center px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border-x border-transparent md:border-slate-100 dark:md:border-slate-700 relative group">
-              {/* Truco: Input nativo de fecha invisible encima del ícono para invocar el calendario */}
-              <input 
-                type="date" 
-                aria-label="Abrir calendario de salida"
-                className="absolute left-0 top-0 w-12 h-full opacity-0 cursor-pointer z-10"
-                onChange={handleNativeDateChange}
-              />
-              <Calendar className="w-5 h-5 text-primary mr-3 shrink-0 group-hover:scale-110 transition-transform" />
-              <input 
-                type="text" 
-                aria-label="Fecha de salida en formato día, mes y año"
-                value={dateSearch}
-                onChange={handleDateChange}
-                placeholder="DD/MM/AAAA" 
-                className="bg-transparent border-none outline-none w-full text-slate-900 dark:text-white font-medium placeholder:text-slate-500" 
-              />
+          <h1 className="text-4xl font-black tracking-tight text-white drop-shadow-lg md:text-5xl">Encuentra la ruta perfecta.</h1>
+          <p className="text-lg font-medium text-slate-200">Búsqueda de cupos y disponibilidad en tiempo real.</p>
+
+          <div className="mt-8 flex w-full flex-col items-center gap-3 rounded-3xl bg-white p-3 shadow-2xl md:flex-row">
+            <div className="relative flex w-full flex-1 items-center rounded-2xl bg-slate-50 px-4 py-3">
+              <MapPin className="mr-3 h-5 w-5 shrink-0 text-primary" />
+              <input type="text" aria-label="Destino" placeholder="¿A dónde?" className="w-full border-none bg-transparent font-medium text-slate-900 outline-none placeholder:text-slate-500" />
             </div>
 
-            <div className="w-full md:w-40 flex items-center px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl">
-              <Users className="w-5 h-5 text-primary mr-3 shrink-0" />
-              <input type="number" aria-label="Número de pasajeros" placeholder="2 Pasaj." min="1" className="bg-transparent border-none outline-none w-full text-slate-900 dark:text-white font-medium placeholder:text-slate-500" />
+            <div className="group relative flex w-full items-center rounded-2xl bg-slate-50 px-4 py-3 md:w-48">
+              <input type="date" aria-label="Abrir calendario de salida" className="absolute left-0 top-0 z-10 h-full w-12 cursor-pointer opacity-0" onChange={handleNativeDateChange} />
+              <Calendar className="mr-3 h-5 w-5 shrink-0 text-primary transition-transform group-hover:scale-110" />
+              <input type="text" aria-label="Fecha de salida en formato día, mes y año" value={dateSearch} onChange={handleDateChange} placeholder="DD/MM/AAAA" className="w-full border-none bg-transparent font-medium text-slate-900 outline-none placeholder:text-slate-500" />
             </div>
 
-            <button type="button" className="w-full md:w-auto min-h-14 px-8 py-4 bg-primary hover:bg-blue-600 text-white font-bold rounded-2xl transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
-              <Search className="w-5 h-5" />
+            <div className="flex w-full items-center rounded-2xl bg-slate-50 px-4 py-3 md:w-40">
+              <Users className="mr-3 h-5 w-5 shrink-0 text-primary" />
+              <input type="number" aria-label="Número de pasajeros" placeholder="2 Pasaj." min="1" className="w-full border-none bg-transparent font-medium text-slate-900 outline-none placeholder:text-slate-500" />
+            </div>
+
+            <button type="button" className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-8 py-4 font-bold text-white shadow-lg shadow-primary/30 transition-all duration-300 ease-out hover:scale-[1.02] hover:bg-primary-strong active:scale-95 md:w-auto">
+              <Search className="h-5 w-5" />
               Buscar
             </button>
           </div>
         </div>
       </div>
 
-      {/* Resultados Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20 pb-20">
-        
-        {/* Controles de Filtros */}
-        <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 mb-8">
-          <p className="font-medium text-slate-600 dark:text-slate-300">
-            <span className="font-bold text-slate-900 dark:text-white">2 salidas</span> encontradas
-          </p>
-          <button type="button" className="min-h-11 flex items-center gap-2 px-4 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
-            <Filter className="w-4 h-4" />
+      <div className="relative z-20 mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <p className="font-medium text-slate-600"><span className="font-bold text-slate-900">2 salidas</span> encontradas</p>
+          <button type="button" className="flex min-h-11 items-center gap-2 rounded-xl px-4 text-sm font-medium text-slate-600 transition-all duration-300 ease-out hover:bg-slate-100 active:scale-95">
+            <Filter className="h-4 w-4" />
             Filtros
           </button>
         </div>
 
-        {/* Tarjetas de Resultados (Lista Desktop / Grid Mobile) */}
         <div className="space-y-6">
           {mockResults.map((tour) => (
-            <div key={tour.id} className="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-slate-200/60 dark:border-slate-800/60">
-              
-              {/* Imagen */}
-              <div className="relative w-full md:w-72 h-56 md:h-auto overflow-hidden">
-                <Image
-                  src={tour.image}
-                  alt={tour.routeName}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-lg text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2 shadow-sm">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            <div key={tour.id} className="group flex flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl md:flex-row">
+              <div className="relative h-56 w-full overflow-hidden md:h-auto md:w-72">
+                <Image src={tour.image} alt={tour.routeName} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute left-4 top-4">
+                  <span className="flex items-center gap-2 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-bold text-slate-900 shadow-sm backdrop-blur-md">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                     Confirmada
                   </span>
                 </div>
               </div>
 
-              {/* Contenido Central */}
-              <div className="flex-1 p-6 flex flex-col">
-                <div className="flex items-center gap-2 text-primary font-bold text-sm mb-2 uppercase tracking-wide">
-                  <Ship className="w-4 h-4" />
-                  {tour.boatName}
+              <div className="flex flex-1 flex-col p-6">
+                <div className="mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-primary"><Ship className="h-4 w-4" />{tour.boatName}</div>
+                <h3 className="mb-2 text-2xl font-black leading-tight text-slate-900">{tour.routeName}</h3>
+                <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium text-slate-600">
+                  <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{tour.duration}</span>
+                  <span className="h-1 w-1 rounded-full bg-slate-300" />
+                  <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" />Salida: {tour.date}</span>
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 leading-tight">
-                  {tour.routeName}
-                </h3>
-                
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600 dark:text-slate-400 font-medium mb-6">
-                  <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {tour.duration}</span>
-                  <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
-                  <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Salida: {tour.date}</span>
-                </div>
-
-                <div className="mt-auto flex items-center gap-3">
-                  <span className="px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-sm font-bold border border-emerald-100 dark:border-emerald-800/30">
-                    {tour.availableSeats} Cupos Libres
-                  </span>
-                </div>
+                <div className="mt-auto flex items-center gap-3"><span className="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-600">{tour.availableSeats} Cupos Libres</span></div>
               </div>
 
-              {/* Bloque Precio y CTA */}
-              <div className="w-full md:w-64 bg-slate-50 dark:bg-slate-800/50 p-6 flex flex-col justify-center items-center md:items-end text-center md:text-right border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800">
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Precio por persona (PVP)</p>
-                <p className="text-3xl font-black text-slate-900 dark:text-white my-2">${tour.price}</p>
-                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mb-6">Comisión aplicable: 15%</p>
-                
-                <button 
-                  type="button"
-                  onClick={() => setSelectedTour(tour)}
-                  className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 dark:bg-primary dark:hover:bg-blue-600 text-white font-bold rounded-xl transition-all duration-300 ease-in-out shadow-md hover:scale-[1.02] active:scale-95"
-                >
-                  Reservar / Bloquear
-                </button>
+              <div className="flex w-full flex-col items-center justify-center border-t border-slate-100 bg-slate-50 p-6 text-center md:w-64 md:items-end md:border-l md:border-t-0 md:text-right">
+                <p className="text-sm font-medium text-slate-500">Precio por persona (PVP)</p>
+                <p className="my-2 text-3xl font-black text-slate-900">${tour.price}</p>
+                <p className="mb-6 text-xs font-bold text-emerald-600">Comisión aplicable: 15%</p>
+                <button type="button" onClick={() => setSelectedTour(tour)} className="w-full rounded-xl bg-slate-900 py-3.5 font-bold text-white shadow-md transition-all duration-300 ease-out hover:scale-[1.02] hover:bg-slate-800 active:scale-95">Reservar / Bloquear</button>
               </div>
-
             </div>
           ))}
         </div>
       </div>
 
-      <BookingModal 
-        isOpen={!!selectedTour} 
-        onClose={() => setSelectedTour(null)} 
-        tour={selectedTour} 
-      />
+      <BookingModal isOpen={!!selectedTour} onClose={() => setSelectedTour(null)} tour={selectedTour} />
     </div>
   );
 }
