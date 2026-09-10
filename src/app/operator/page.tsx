@@ -5,72 +5,56 @@ import { Users, Clock, AlertTriangle, ArrowRight, Anchor } from "lucide-react";
 
 export default function OperatorDashboard() {
   return (
-    <div className="p-4 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      
-      {/* Saludo */}
+    <div className="space-y-6 p-4 pb-24 sm:p-5">
       <div className="pt-2">
-        <h1 className="text-2xl font-black text-slate-900 dark:text-white">¡Hola, Capitán! 👋</h1>
-        <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Resumen operativo para el día de hoy.</p>
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--primary)]">Panel operativo</p>
+        <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-900">¡Hola, Capitán! 👋</h1>
+        <p className="mt-1 text-sm text-slate-500">Resumen operativo para el día de hoy.</p>
       </div>
 
-      {/* Próximo Zarpe Destacado */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-5 text-white shadow-xl shadow-blue-900/20 relative overflow-hidden">
-        {/* Adorno visual */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-0 right-0 opacity-10">
-          <Anchor className="w-32 h-32" />
-        </div>
-
+      <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[var(--primary)] to-[#075b69] p-5 text-white shadow-xl shadow-teal-900/15">
+        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute bottom-0 right-0 opacity-10"><Anchor className="h-32 w-32" /></div>
         <div className="relative z-10">
-          <div className="flex justify-between items-start mb-4">
-            <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-xs font-bold uppercase tracking-wide">
-              Próximo Zarpe
-            </span>
-            <span className="text-sm font-bold flex items-center gap-1">
-              <Clock className="w-4 h-4" /> En 2 horas
-            </span>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <span className="rounded-lg bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide backdrop-blur">Próximo zarpe</span>
+            <span className="flex items-center gap-1 text-sm font-bold"><Clock className="h-4 w-4" />En 2 horas</span>
           </div>
+          <h2 className="text-2xl font-black tracking-tight">Isabela &amp; Fernandina</h2>
+          <p className="mt-1 text-sm text-teal-100">Salida: 08:00 AM • Pto. Ayora</p>
 
-          <h3 className="text-2xl font-black mb-1">Isabela & Fernandina</h3>
-          <p className="text-blue-100 text-sm mb-6">Salida: 08:00 AM • Pto. Ayora</p>
-
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            <div className="bg-white/10 rounded-2xl p-3 backdrop-blur-md border border-white/10">
-              <p className="text-xs text-blue-200 font-bold uppercase">Pasajeros</p>
-              <p className="text-2xl font-black flex items-center gap-2">
-                <Users className="w-5 h-5" /> 12<span className="text-sm text-blue-200">/16</span>
-              </p>
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-md">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-teal-100">Pasajeros</p>
+              <p className="mt-1 flex items-center gap-2 text-2xl font-black"><Users className="h-5 w-5" />12<span className="text-sm text-teal-100">/16</span></p>
             </div>
-            <div className="bg-white/10 rounded-2xl p-3 backdrop-blur-md border border-white/10">
-              <p className="text-xs text-blue-200 font-bold uppercase">Cupos Libres</p>
-              <p className="text-2xl font-black text-emerald-300">4</p>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-md">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-teal-100">Cupos libres</p>
+              <p className="mt-1 text-2xl font-black text-emerald-200">4</p>
             </div>
           </div>
 
-          <Link 
-            href="/operator/availability"
-            className="w-full py-3 bg-white text-blue-700 font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-300 ease-in-out"
-          >
-            Actualizar Cupos <ArrowRight className="w-5 h-5" />
+          <Link href="/operator/availability" className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 font-bold text-[var(--primary)] shadow-lg transition hover:-translate-y-0.5 hover:bg-slate-50 active:scale-[0.98]">
+            Actualizar cupos <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
-      </div>
+      </section>
 
-      {/* Alertas Operativas */}
-      <div>
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Alertas Recientes</h3>
-        
-        <div className="space-y-3">
-          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/50 p-4 rounded-2xl flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-900">Alertas recientes</h2>
+          <span className="rounded-full bg-orange-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-orange-700">1 activa</span>
+        </div>
+        <div className="rounded-2xl border border-orange-100 bg-orange-50/80 p-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-orange-500 shadow-sm"><AlertTriangle className="h-5 w-5" /></span>
             <div>
-              <p className="text-sm font-bold text-orange-800 dark:text-orange-300">Reserva Bloqueada a punto de expirar</p>
-              <p className="text-xs text-orange-700 dark:text-orange-300 mt-1">La agencia &lsquo;Galapagos Dreams&rsquo; tiene 4 cupos bloqueados que expiran en 30 minutos.</p>
+              <p className="text-sm font-bold text-orange-900">Reserva bloqueada a punto de expirar</p>
+              <p className="mt-1 text-xs leading-relaxed text-orange-800">La agencia “Galapagos Dreams” tiene 4 cupos bloqueados que expiran en 30 minutos.</p>
             </div>
           </div>
         </div>
-      </div>
-
+      </section>
     </div>
   );
 }
