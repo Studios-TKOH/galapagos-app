@@ -3,34 +3,30 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
+        getAll: () => request.cookies.getAll(),
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },
     },
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { claims } } = await supabase.auth.getClaims();
   const pathname = request.nextUrl.pathname;
-  const protectedArea = pathname.startsWith("/admin") || pathname.startsWith("/agency") || pathname.startsWith("/operator");
+  const protectedArea = ["/admin", "/agency", "/operator"].some((area) => pathname.startsWith(area));
 
-  if (protectedArea && !user) {
+  if (protectedArea && !claims) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
-    url.searchParams.set("next", pathname);
+    const next = pathname.startsWith("/") ? pathname : "/";
+    url.searchParams.set("next", next);
     return NextResponse.redirect(url);
   }
 
