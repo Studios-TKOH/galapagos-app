@@ -1,139 +1,100 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Ship, Edit2, Trash2, Users, Wrench, XCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Plus, Ship, Users, Loader2, AlertCircle, Inbox } from "lucide-react";
 import { VesselFormModal } from "@/components/admin/VesselFormModal";
+import { createClient } from "@/lib/supabase/client";
 
-// Mock data para las embarcaciones (con los 3 estados)
-const mockVessels = [
-  {
-    id: 1,
-    name: "Galaxy I",
-    capacity: 16,
-    owner: "Galapagos EcoTours S.A.",
-    status: "active",
-  },
-  {
-    id: 2,
-    name: "Sea Wolf",
-    capacity: 12,
-    owner: "Wolf Expeditions",
-    status: "active",
-  },
-  {
-    id: 3,
-    name: "Santa Cruz II",
-    capacity: 90,
-    owner: "Metropolitan Touring",
-    status: "maintenance",
-  },
-  {
-    id: 4,
-    name: "La Pinta",
-    capacity: 48,
-    owner: "Metropolitan Touring",
-    status: "out_of_service",
-  }
-];
+type Vessel = {
+  id: string;
+  name: string;
+  capacity: number;
+  registration_number: string | null;
+  vessel_type: string | null;
+};
 
 export default function VesselsPage() {
+  const supabase = useMemo(() => createClient(), []);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [vessels, setVessels] = useState<Vessel[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadVessels() {
+      setLoading(true);
+      const { data, error: queryError } = await supabase
+        .from("vessels")
+        .select("id,name,capacity,registration_number,vessel_type")
+        .order("name", { ascending: true });
+
+      if (!mounted) return;
+      if (queryError) setError("No fue posible cargar la flota. Intenta nuevamente.");
+      else setVessels((data ?? []) as Vessel[]);
+      setLoading(false);
+    }
+    loadVessels();
+    return () => { mounted = false; };
+  }, [supabase]);
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      
-      {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
+          <span className="text-xs font-black uppercase tracking-widest text-primary">Operaciones</span>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Embarcaciones</h1>
-          <p className="text-slate-500 dark:text-slate-400">Gestiona la flota y la capacidad operativa.</p>
+          <p className="text-slate-500 dark:text-slate-400">Gestiona la flota registrada en el sistema.</p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          type="button"
-          className="flex items-center justify-center gap-2 px-5 py-3 bg-primary text-white font-medium rounded-xl hover:bg-blue-600 transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95"
-        >
-          <Plus className="w-5 h-5" />
-          Nueva Embarcación
+        <button type="button" onClick={() => setIsModalOpen(true)} className="inline-flex min-h-11 items-center justify-center gap-2 px-5 py-3 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-950">
+          <Plus className="w-5 h-5" /> Nueva Embarcación
         </button>
       </div>
 
-      {/* Lista Horizontal de Tarjetas */}
-      <div className="space-y-4 pt-4">
-        {mockVessels.map((vessel) => {
-          // Determinar estilos y textos según estado
-          let StatusIcon = Ship;
-          let statusColor = "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
-          let badgeColor = "bg-slate-100 text-slate-700 dark:bg-slate-800/40 dark:text-slate-400";
-          let statusText = "Desconocido";
+      {error && (
+        <div role="alert" className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+          <AlertCircle className="h-5 w-5 shrink-0" /> {error}
+        </div>
+      )}
 
-          if (vessel.status === 'active') {
-            StatusIcon = Ship;
-            statusColor = "bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400";
-            badgeColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400";
-            statusText = "Activa";
-          } else if (vessel.status === 'maintenance') {
-            StatusIcon = Wrench;
-            statusColor = "bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400";
-            badgeColor = "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400";
-            statusText = "Mantenimiento";
-          } else if (vessel.status === 'out_of_service') {
-            StatusIcon = XCircle;
-            statusColor = "bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400";
-            badgeColor = "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400";
-            statusText = "Fuera de Servicio";
-          }
-
-          return (
-            <div 
-              key={vessel.id} 
-              className="glass p-5 rounded-2xl grid grid-cols-1 sm:grid-cols-12 gap-6 items-center transition-all hover:shadow-lg dark:hover:shadow-primary/5 hover:-translate-y-0.5 border border-slate-200/60 dark:border-slate-800/60"
-            >
-              {/* Bloque 1: Icono y Nombre (Ocupa 5 columnas en desktop) */}
-              <div className="sm:col-span-6 md:col-span-5 flex items-center gap-5">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner ${statusColor}`}>
-                  <StatusIcon className="w-7 h-7" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">
-                      {vessel.name}
-                    </h3>
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold tracking-wide uppercase ${badgeColor}`}>
-                      {statusText}
-                    </span>
+      {loading ? (
+        <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center dark:border-slate-800 dark:bg-slate-900">
+          <Loader2 className="mx-auto h-7 w-7 animate-spin text-primary" />
+          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">Cargando embarcaciones…</p>
+        </div>
+      ) : vessels.length === 0 ? (
+        <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-12 text-center dark:border-slate-700 dark:bg-slate-900/50">
+          <Inbox className="mx-auto h-10 w-10 text-slate-300 dark:text-slate-600" />
+          <h2 className="mt-4 font-bold text-slate-900 dark:text-white">No hay embarcaciones registradas</h2>
+          <p className="mx-auto mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">La flota aparecerá aquí cuando se registre una embarcación.</p>
+        </div>
+      ) : (
+        <div className="space-y-4 pt-2">
+          {vessels.map((vessel) => (
+            <article key={vessel.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900 dark:hover:shadow-primary/5">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-12 sm:items-center">
+                <div className="sm:col-span-6 md:col-span-5 flex items-center gap-4 min-w-0">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+                    <Ship className="h-7 w-7" />
                   </div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
-                    Operada por: <span className="font-medium text-slate-700 dark:text-slate-300">{vessel.owner}</span>
-                  </p>
+                  <div className="min-w-0">
+                    <h2 className="truncate text-lg font-bold text-slate-900 dark:text-white">{vessel.name}</h2>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{vessel.vessel_type || "Tipo no especificado"}</p>
+                    {vessel.registration_number && <p className="truncate text-xs text-slate-400 dark:text-slate-500">Matrícula: {vessel.registration_number}</p>}
+                  </div>
+                </div>
+                <div className="sm:col-span-3 md:col-span-4 flex items-center gap-3 border-t border-slate-100 pt-4 dark:border-slate-800 sm:border-l sm:border-t-0 sm:pt-0 sm:pl-5">
+                  <div className="rounded-lg bg-primary/10 p-2 text-primary"><Users className="h-5 w-5" /></div>
+                  <div><div className="text-lg font-bold leading-none text-slate-900 dark:text-white">{vessel.capacity}</div><div className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">pasajeros máx.</div></div>
+                </div>
+                <div className="sm:col-span-3 md:col-span-3 flex justify-end border-t border-slate-100 pt-4 dark:border-slate-800 sm:border-t-0 sm:pt-0">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Registrada</span>
                 </div>
               </div>
-
-              {/* Bloque 2: Capacidad (Ocupa 3 columnas en desktop) */}
-              <div className="sm:col-span-3 md:col-span-4 flex sm:justify-center items-center gap-3 px-4 sm:border-l border-slate-100 dark:border-slate-800">
-                <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                  <Users className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="font-bold text-lg text-slate-900 dark:text-white leading-none">{vessel.capacity}</div>
-                  <div className="text-xs text-slate-500 font-medium mt-1">pasajeros máx.</div>
-                </div>
-              </div>
-
-              {/* Bloque 3: Acciones (Ocupa 3 columnas en desktop) */}
-              <div className="sm:col-span-3 md:col-span-3 flex items-center justify-end gap-2 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
-                <button type="button" aria-label={`Editar ${vessel.name}`} className="min-h-11 flex-1 sm:flex-none flex items-center justify-center px-4 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
-                  <Edit2 className="w-4 h-4 mr-2" />
-                  Editar
-                </button>
-                <button type="button" aria-label={`Eliminar ${vessel.name}`} className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all duration-300 ease-in-out active:scale-95">
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            </article>
+          ))}
+        </div>
+      )}
 
       <VesselFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
