@@ -1,156 +1,70 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Mail, MessageCircle, Edit2, ShieldBan, CheckCircle2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Plus, Mail, MessageCircle, Loader2, AlertCircle, Inbox, Building2 } from "lucide-react";
 import { AgencyFormModal } from "@/components/admin/AgencyFormModal";
+import { createClient } from "@/lib/supabase/client";
 
-// Mock data para agencias
-const mockAgencies = [
-  {
-    id: 1,
-    name: "Galapagos Dreams",
-    email: "reservas@galapagosdreams.com",
-    phone: "+593 98 123 4567",
-    commission: 15,
-    status: "active",
-    reservationsThisMonth: 24
-  },
-  {
-    id: 2,
-    name: "Blue Water Tours",
-    email: "info@bluewatertours.ec",
-    phone: "+593 99 765 4321",
-    commission: 20,
-    status: "active",
-    reservationsThisMonth: 12
-  },
-  {
-    id: 3,
-    name: "Ecuador Travel & Co.",
-    email: "booking@ecuadortravel.com",
-    phone: "+593 97 111 2222",
-    commission: 10,
-    status: "suspended",
-    reservationsThisMonth: 0
-  },
-  {
-    id: 4,
-    name: "Nature Expeditions",
-    email: "hello@nature-expeditions.com",
-    phone: "+593 99 888 7777",
-    commission: 15,
-    status: "active",
-    reservationsThisMonth: 8
-  }
-];
+type Agency = { id: string; name: string; ruc: string | null; email: string | null; phone: string | null; address: string | null };
 
 export default function AgenciesPage() {
+  const supabase = useMemo(() => createClient(), []);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [agencies, setAgencies] = useState<Agency[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadAgencies() {
+      setLoading(true);
+      const { data, error: queryError } = await supabase.from("agencies").select("id,name,ruc,email,phone,address").order("name", { ascending: true });
+      if (!mounted) return;
+      if (queryError) setError("No fue posible cargar las agencias. Intenta nuevamente.");
+      else setAgencies((data ?? []) as Agency[]);
+      setLoading(false);
+    }
+    loadAgencies();
+    return () => { mounted = false; };
+  }, [supabase]);
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      
-      {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
+          <span className="text-xs font-black uppercase tracking-widest text-primary">B2B</span>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Directorio de Agencias</h1>
-          <p className="text-slate-500 dark:text-slate-400">Gestiona los permisos y comisiones de tus aliados comerciales (B2B).</p>
+          <p className="text-slate-500 dark:text-slate-400">Consulta las agencias registradas y sus datos de contacto.</p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          type="button"
-          className="flex items-center justify-center gap-2 px-5 py-3 bg-primary text-white font-medium rounded-xl hover:bg-blue-600 transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95"
-        >
-          <Plus className="w-5 h-5" />
-          Nueva Agencia
+        <button type="button" onClick={() => setIsModalOpen(true)} className="inline-flex min-h-11 items-center justify-center gap-2 px-5 py-3 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-950">
+          <Plus className="w-5 h-5" /> Nueva Agencia
         </button>
       </div>
 
-      {/* Tarjetas de Contacto (Grid) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pt-4">
-        {mockAgencies.map((agency) => (
-          <div 
-            key={agency.id} 
-            className="glass rounded-2xl flex flex-col transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-primary/5 border border-slate-200/60 dark:border-slate-800/60 overflow-hidden relative"
-          >
-            {/* Cabecera Tarjeta */}
-            <div className={`p-6 border-b border-slate-100 dark:border-slate-800/60 ${agency.status === 'suspended' ? 'bg-slate-50/50 dark:bg-slate-900/20' : 'bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800/50'}`}>
-              <div className="flex justify-between items-start mb-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold shadow-sm ${
-                  agency.status === 'active' 
-                    ? 'bg-gradient-to-tr from-blue-500 to-primary text-white' 
-                    : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
-                }`}>
-                  {agency.name.charAt(0)}
-                </div>
-                
-                <span className={`px-2.5 py-1 rounded-full text-xs font-bold tracking-wider uppercase flex items-center gap-1 ${
-                  agency.status === 'active' 
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' 
-                    : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
-                }`}>
-                  {agency.status === 'active' ? (
-                    <><CheckCircle2 className="w-3 h-3" /> Activa</>
-                  ) : (
-                    <><ShieldBan className="w-3 h-3" /> Suspendida</>
-                  )}
-                </span>
-              </div>
-              
-              <h3 className={`text-xl font-bold truncate ${agency.status === 'active' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>
-                {agency.name}
-              </h3>
-            </div>
+      {error && <div role="alert" className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300"><AlertCircle className="h-5 w-5 shrink-0" />{error}</div>}
 
-            {/* Cuerpo Tarjeta */}
-            <div className="p-6 flex-1 flex flex-col gap-4">
-              <div className="flex flex-col gap-3">
-                <a href={`mailto:${agency.email}`} className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300 hover:text-primary transition-colors group">
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <span className="truncate">{agency.email}</span>
-                </a>
-                
-                <a href={`https://wa.me/${agency.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300 hover:text-emerald-500 transition-colors group">
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/20">
-                    <MessageCircle className="w-4 h-4" />
-                  </div>
-                  <span className="truncate">{agency.phone}</span>
-                </a>
+      {loading ? (
+        <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center dark:border-slate-800 dark:bg-slate-900"><Loader2 className="mx-auto h-7 w-7 animate-spin text-primary" /><p className="mt-3 text-sm text-slate-500 dark:text-slate-400">Cargando agencias…</p></div>
+      ) : agencies.length === 0 ? (
+        <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-12 text-center dark:border-slate-700 dark:bg-slate-900/50"><Inbox className="mx-auto h-10 w-10 text-slate-300 dark:text-slate-600" /><h2 className="mt-4 font-bold text-slate-900 dark:text-white">No hay agencias registradas</h2><p className="mx-auto mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">Las agencias aparecerán aquí cuando sean registradas en la plataforma.</p></div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 pt-2 md:grid-cols-2 xl:grid-cols-3">
+          {agencies.map((agency) => (
+            <article key={agency.id} className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900 dark:hover:shadow-primary/5">
+              <div className="border-b border-slate-100 bg-gradient-to-br from-white to-slate-50 p-6 dark:border-slate-800 dark:from-slate-900 dark:to-slate-800/50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-primary dark:bg-blue-900/20"><Building2 className="h-6 w-6" /></div>
+                <h2 className="mt-4 truncate text-xl font-bold text-slate-900 dark:text-white">{agency.name}</h2>
+                {agency.ruc && <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">RUC: {agency.ruc}</p>}
               </div>
-
-              {/* Métricas pequeñas */}
-              <div className="mt-auto pt-4 grid grid-cols-2 gap-4 border-t border-slate-100 dark:border-slate-800/60">
-                <div>
-                  <p className="text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-1">Comisión</p>
-                  <p className="text-lg font-bold text-slate-900 dark:text-white">{agency.commission}%</p>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-1">Mes Actual</p>
-                  <p className="text-lg font-bold text-slate-900 dark:text-white">{agency.reservationsThisMonth} res.</p>
-                </div>
+              <div className="flex flex-1 flex-col gap-3 p-6">
+                {agency.email ? <a href={`mailto:${agency.email}`} className="flex min-h-11 items-center gap-3 rounded-xl px-2 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-800"><Mail className="h-4 w-4 shrink-0" /><span className="truncate">{agency.email}</span></a> : <p className="text-sm text-slate-400">Sin correo registrado</p>}
+                {agency.phone ? <a href={`tel:${agency.phone}`} className="flex min-h-11 items-center gap-3 rounded-xl px-2 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-800"><MessageCircle className="h-4 w-4 shrink-0" /><span>{agency.phone}</span></a> : <p className="text-sm text-slate-400">Sin teléfono registrado</p>}
+                {agency.address && <p className="mt-auto border-t border-slate-100 pt-4 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">{agency.address}</p>}
               </div>
-            </div>
-
-            {/* Acciones Rápidas */}
-            <div className="grid grid-cols-2 divide-x divide-slate-100 dark:divide-slate-800 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
-              <button type="button" className="min-h-11 flex items-center justify-center gap-2 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary transition-all duration-300 ease-in-out active:scale-95">
-                <Edit2 className="w-4 h-4" />
-                Editar
-              </button>
-              <button type="button" className={`min-h-11 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-all duration-300 ease-in-out active:scale-95 ${
-                agency.status === 'active' 
-                  ? 'text-orange-600 dark:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20' 
-                  : 'text-emerald-600 dark:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
-              }`}>
-                <ShieldBan className="w-4 h-4" />
-                {agency.status === 'active' ? 'Suspender' : 'Reactivar'}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+            </article>
+          ))}
+        </div>
+      )}
 
       <AgencyFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
