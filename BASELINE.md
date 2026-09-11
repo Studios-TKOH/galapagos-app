@@ -126,7 +126,7 @@ Para reducir consumo de GitHub Actions, `Production Check`, `Documentation Quali
 - voucher accesible por token;
 - happy path comercial cubierto por E2E real.
 
-Pendiente: hold con expiración, pago/conciliación, pasajeros individuales y escenarios E2E negativos/cancelación.
+Hold con expiración e idempotencia disponible en backend en la rama `feature/o2-holds-idempotency`; pendiente payment ledger, integración UI, pasajeros individuales y escenarios E2E negativos/cancelación.
 
 ### Operator
 
@@ -158,6 +158,10 @@ Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline
 ## R3 — Voucher operacional: integrado en `dev`
 
 R3 quedó integrado en `dev` mediante el PR #8. La migración append-only añade estados `issued/redeemed/revoked/expired`, redención atómica con `FOR UPDATE`, `voucher_redemptions`, auditoría, QR visual, UI `/operator/redeem` y E2E de navegador para operador. La integración CI cubre autorización, ownership, cancelación, doble uso y concurrencia.
+
+## O2/C3.1 — Holds e idempotencia en feature branch
+
+La rama `feature/o2-holds-idempotency` añade `create_reservation_hold`, `confirm_reservation_hold`, liberación de holds expirados y clave idempotente por usuario. La suite Supabase cubre repetición, conflicto de payload, expiración, autorización y concurrencia del último cupo. Requiere CI real antes de integrarse.
 
 ## Riesgo por área
 

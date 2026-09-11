@@ -81,7 +81,8 @@ Además del baseline R1:
 
 - reserva concurrente del último cupo;
 - hold + expiración;
-- idempotencia;
+- idempotencia de creación y conflicto de payload;
+- confirmación autorizada de hold con emisión única de voucher;
 - redención única;
 - voucher válido, ya redimido, inexistente y cancelado;
 - roles autorizados/no autorizados, ownership de operador y concurrencia de redención;
