@@ -91,7 +91,7 @@ npm run test:integration
 
 El workflow `Supabase Integration` automatiza el stack efímero, `db reset`, usuarios/fixtures y **18 pruebas de integración** en PRs relevantes contra `dev`/`main`; no usa secretos del proyecto remoto.
 
-El workflow `Critical E2E` levanta un Supabase local mínimo y ejecuta Chromium contra la aplicación real. El happy path integrado en R2 verifica login de agencia, búsqueda, reserva de dos pasajeros, cálculo de comisión, voucher público válido y decremento de inventario. La guía completa de ejecución local está en [docs/guides/TESTING.md](./docs/guides/TESTING.md). R3 añade integración PostgreSQL para redención, anti doble uso, concurrencia y autorización; el E2E de operador queda pendiente.
+El workflow `Critical E2E` levanta un Supabase local mínimo y ejecuta Chromium contra la aplicación real. El flujo integrado verifica login de agencia, búsqueda, reserva de dos pasajeros, cálculo de comisión, voucher público, login de operador, redención y bloqueo del segundo uso. La guía completa de ejecución local está en [docs/guides/TESTING.md](./docs/guides/TESTING.md). R3 añade integración PostgreSQL para redención, anti doble uso, concurrencia y autorización.
 
 Los workflows de PR usan cancelación de ejecuciones obsoletas donde aplica para evitar consumir minutos en revisiones reemplazadas por un commit más reciente. CI debe ser verde antes de mergear a `dev`. `main` requiere además revisión y gate de producción.
 
@@ -121,7 +121,7 @@ Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
 
 ## Próximo frente
 
-**R3 — Voucher operacional / redención** está implementado en esta feature branch a nivel de migración, integración y UI mínima: QR, redención autoritativa, anti doble uso, auditoría y pruebas negativas/positivas. Falta validar contra Supabase local y completar E2E operacional antes de abrir PR.
+**R3 — Voucher operacional / redención** está implementado en esta feature branch a nivel de migración, integración, E2E y UI mínima: QR, redención autoritativa, anti doble uso, auditoría y pruebas negativas/positivas. Falta ejecutar CI contra Supabase/Docker antes de abrir PR.
 
 ## Estado de producción
 

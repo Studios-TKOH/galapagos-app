@@ -22,6 +22,7 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 - Migración R3 con estados de voucher, redención atómica, tabla append-only de redenciones y auditoría.
 - UI operacional `/operator/redeem` y QR basado únicamente en el token opaco de verificación.
 - Tests de integración R3 para autorización, ownership, doble uso, concurrencia y estados inválidos.
+- E2E Critical ampliado con login de operador, redención real y bloqueo del segundo uso.
 
 ### Fixed
 - Sincronización reproducible de `package-lock.json` con Supabase, Next.js 16.3.4 y `eslint-config-next` 16.3.4.
@@ -54,7 +55,7 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 
 ### Known issues
 - `main` continúa clasificado como UNSTABLE aunque **S0, R1 y R2 ya están integrados en `dev`**.
-- Permanecen pendientes: E2E operacional de redención, scanner de cámara, pagos/conciliación, holds, manifiesto/check-in, rutas/salidas CRUD completas, offline-first, observabilidad y deploy/rollback probado.
+- Permanecen pendientes: scanner de cámara, pagos/conciliación, holds, manifiesto/check-in, rutas/salidas CRUD completas, offline-first, observabilidad y deploy/rollback probado.
 - R3 está en desarrollo en `feature/r3-voucher-redemption` y requiere validación Supabase local/CI antes de integrarse.
 
 ## [0.1.0] - 2026-09-10

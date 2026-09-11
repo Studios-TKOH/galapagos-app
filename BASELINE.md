@@ -157,7 +157,7 @@ Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline
 
 ## R3 — Voucher operacional en feature branch
 
-La rama `feature/r3-voucher-redemption` contiene una migración append-only para estados `issued/redeemed/revoked/expired`, redención atómica con `FOR UPDATE`, `voucher_redemptions`, auditoría, QR visual y UI `/operator/redeem`. La suite de integración cubre autorización, ownership, cancelación, doble uso y concurrencia. Este trabajo todavía no está integrado en `dev`: Supabase CLI no está disponible en el entorno local para ejecutar el reset y la suite real, y falta E2E de navegador para operador.
+La rama `feature/r3-voucher-redemption` contiene una migración append-only para estados `issued/redeemed/revoked/expired`, redención atómica con `FOR UPDATE`, `voucher_redemptions`, auditoría, QR visual, UI `/operator/redeem` y E2E de navegador para operador. La suite de integración cubre autorización, ownership, cancelación, doble uso y concurrencia. Este trabajo todavía no está integrado en `dev`: la CLI puede ejecutarse mediante `npx`, pero Docker no está disponible para ejecutar el reset y la suite real localmente.
 
 ## Riesgo por área
 
@@ -170,7 +170,7 @@ La rama `feature/r3-voucher-redemption` contiene una migración append-only para
 | Comisión | configurable por agencia | administración/edición |
 | Admin agency/tour create | persistente y RLS validado | edición/eliminación/rutas |
 | E2E browser | happy path comercial **verde e integrado** | negativos + operator/redención |
-| Voucher redemption | implementado en feature branch; pendiente integración/E2E | **P1 / validación y PR R3** |
+| Voucher redemption | implementado en feature branch; pendiente CI/integración | **P1 / validación y PR R3** |
 | Offline | ausente | P1/P2 |
 
 ## Próximo frente recomendado

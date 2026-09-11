@@ -93,7 +93,7 @@ El happy path agency ya tiene gate verde e integrado. Permanecen:
 
 - login/guards negativos por rol;
 - cancelación y reprogramación;
-- operador/guide y redención;
+- operador y redención online: login, verificación, confirmación y segundo intento bloqueado;
 - pagos/conciliación;
 - errores de conectividad y recuperación.
 

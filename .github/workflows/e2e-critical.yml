@@ -22,6 +22,8 @@ jobs:
     env:
       E2E_AGENCY_EMAIL: e2e-agency@example.test
       E2E_AGENCY_PASSWORD: E2E-Password!42
+      E2E_OPERATOR_EMAIL: e2e-operator@example.test
+      E2E_OPERATOR_PASSWORD: E2E-Operator-Password!42
     steps:
       - uses: actions/checkout@v5
 

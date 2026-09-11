@@ -5,6 +5,8 @@ const url = process.env.SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const agencyEmail = process.env.E2E_AGENCY_EMAIL ?? 'e2e-agency@example.test';
 const agencyPassword = process.env.E2E_AGENCY_PASSWORD ?? 'E2E-Password!42';
+const operatorEmail = process.env.E2E_OPERATOR_EMAIL ?? 'e2e-operator@example.test';
+const operatorPassword = process.env.E2E_OPERATOR_PASSWORD ?? 'E2E-Operator-Password!42';
 
 if (!url || !serviceRoleKey) {
   throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for the E2E fixture.');
@@ -43,8 +45,8 @@ assert.ok(roles.agency && roles.operator, 'agency and operator roles must exist'
 
 const agencyUserId = await createUser(agencyEmail, agencyPassword, 'E2E', 'Agency');
 const operatorUserId = await createUser(
-  'e2e-operator@example.test',
-  'E2E-Operator-Password!42',
+  operatorEmail,
+  operatorPassword,
   'E2E',
   'Operator',
 );

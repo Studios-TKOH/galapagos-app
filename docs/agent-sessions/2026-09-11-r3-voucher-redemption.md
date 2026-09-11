@@ -67,6 +67,9 @@ commands_run:
   - "npm run build con variables Supabase locales de prueba"
   - "npm audit --audit-level=high"
   - "npm run test:integration"
+  - "npx --yes supabase@2.117.0 --version"
+  - "node --check tests/e2e/setup-fixture.mjs"
+  - "node --check tests/e2e/critical-booking.spec.mjs"
 validation_results:
   - "docs:validate, docs:health, changelog:validate: passed; docs health 98/100 with only git freshness for uncommitted migration"
   - "lint: passed"
@@ -74,7 +77,8 @@ validation_results:
   - "npm test: 7/7 passed"
   - "build: passed with local test environment variables; without variables it fails at existing login-page Supabase client initialization"
   - "npm audit: 0 vulnerabilities"
-  - "integration: blocked because Supabase CLI and required environment variables are unavailable locally"
+  - "integration: blocked because Docker is unavailable locally; Supabase CLI 2.117.0 is available through npx"
+  - "E2E fixture/spec syntax: passed; browser execution awaits CI Docker stack"
 docs_updated:
   - README.md
   - BASELINE.md
@@ -88,7 +92,7 @@ docs_updated:
 remaining_risks:
   - "Debe ejecutarse supabase db reset y tests/integration contra el stack local/CI para validar la migración SQL R3 y la concurrencia real."
   - "Falta E2E de operador y scanner de cámara; el primer slice acepta token o URL pegada."
-  - "El commit d54e9af consolida el lote; push y PR quedan pendientes de validación Supabase real."
+  - "Los commits e6d50f3 y 09dde88 consolidan implementación y E2E; requieren CI Docker antes del PR."
 ```
 
 ## Decisiones resumidas
