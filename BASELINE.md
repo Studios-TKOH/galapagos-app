@@ -2,159 +2,147 @@
 
 **Snapshot:** 2026-09-11  
 **`dev` después de S0:** `c444066661db53a6ea80b43daaf728ee02c33d5a`  
+**R1 validado en PR #5:** código `0e93a5fa9ecd159173f076b3d5c3d869d82cb940`  
 **Clasificación de `main`:** **UNSTABLE / NO PRODUCCIÓN**
 
-Este baseline distingue el estado recuperado de `dev` del estado de producción. S0 fue integrado en `dev`, pero el sistema completo todavía no cumple el criterio de producción porque faltan integración Supabase, E2E crítico y capacidades operativas P1.
+Este baseline distingue un `dev` recuperado de un producto listo para producción. S0 ya está integrado en `dev`; R1 está validado en la rama `feature/r1-integration-functional` y pendiente de revisión/merge. `main` sigue UNSTABLE porque aún faltan E2E crítico, despliegue/rollback probado y capacidades operativas P1.
 
 ## Resumen ejecutivo
 
-La base Next.js + Supabase ya volvió a un estado construible y reproducible en `dev`. El PR #4 de S0 fue mergeado y los workflows post-merge `Production Check` y `Documentation Quality` finalizaron en verde.
+R1 cerró el bloque de integración Supabase y varias deudas funcionales que S0 había dejado explícitas. El estado validado tiene los tres gates verdes:
 
-R1 se concentra en demostrar seguridad multi-tenant contra una instancia Supabase real reseteada y, después, cerrar deuda funcional inmediata de búsqueda, comisión y CRUD prioritario.
-
-## Evidencia S0 integrada
-
-| Gate | Estado en `dev` |
+| Gate | Evidencia R1 |
 |---|---|
 | Documentation Quality | **verde** |
+| Production Check | **verde** |
 | `npm ci` | **verde** |
 | `npm audit` | **0 vulnerabilidades** |
 | ESLint | **verde** |
 | TypeScript | **verde** |
-| Tests S0 | **7/7** |
-| `next build` | **verde; 14/14 rutas generadas** |
-| CI post-merge PR #4 | **verde** |
-| Integración Supabase runtime | pendiente de R1 |
+| Tests rápidos S0 | **7/7** |
+| `next build` | **verde** |
+| Supabase local + `db reset` | **verde** |
+| Integración Auth/RLS/RPC/PostgREST | **18/18** |
 
-S0 corrigió reproducibilidad, errores TypeScript/build, redirect por rol, signup sin rol implícito, gaps RLS, ownership de operador y checks internos de RPC `SECURITY DEFINER`.
+La integración usa un stack Supabase efímero reconstruido desde migraciones + seed. No depende de claves ni datos del proyecto remoto.
 
-## R1 — alcance activo
+## R1.1 — seguridad e integración: cerrado en rama
 
-Rama de trabajo: `feature/r1-integration-functional`.
+Quedaron demostrados en runtime:
 
-### R1.1 Seguridad e integración
+- un usuario nuevo permanece sin rol operativo;
+- un usuario no admin no puede autoasignarse `role_id`;
+- admin puede aprovisionar roles mediante `assign_user_role(UUID,TEXT)` y la acción se audita;
+- agency A/B permanece aislada por membresía;
+- operator A/B solo ve y muta su propia flota y recursos derivados;
+- `INSERT` directo de reservas está bloqueado: la creación debe pasar por `create_reservation`;
+- una agencia no puede reservar en nombre de otro tenant;
+- reserva autorizada decrementa inventario atómicamente;
+- RPCs de cupos/cancelación rechazan mutaciones cross-operator;
+- cancelación invalida el voucher para verificación pública;
+- admin mantiene visibilidad global donde corresponde.
 
-- levantar Supabase local efímero en GitHub Actions;
-- reset completo desde migraciones + seed;
-- crear usuarios reales `admin`, `agency A/B`, `operator A/B` y perfil pendiente;
-- demostrar accesos positivos/negativos de RLS;
-- demostrar ownership en RPC de cupos/cancelación;
-- impedir autoescalación de `profiles.role_id`;
-- impedir `INSERT` directo de reservas que salte el motor transaccional;
-- proporcionar aprovisionamiento de rol explícito y auditable mediante `assign_user_role`.
+Los tests vivos detectaron y permitieron corregir dos defectos que build/typecheck no podían encontrar:
 
-### R1.2 Funcionalidad inmediata
+1. ambigüedad PL/pgSQL en `available_seats` dentro de `create_reservation`;
+2. `gen_random_bytes()` no visible con `search_path = public`; el token ahora usa explícitamente `extensions.gen_random_bytes(24)`.
 
-Después del gate de integración:
+## R1.2 — funcionalidad inmediata: cerrado en rama
 
-- mover búsqueda de destino al servidor para no filtrar después de `LIMIT 50`;
-- sustituir comisión fija del motor/UI por configuración de dominio;
-- priorizar CRUD admin actualmente simulado según impacto operacional;
-- preparar E2E login → búsqueda → reserva → voucher.
+### Búsqueda de agencia
 
-## Dependencias
+- `search_availability(DATE,TEXT,INT)` filtra fecha, ruta/origen/destino y pasajeros en PostgreSQL antes del `LIMIT 50`;
+- la función es `SECURITY INVOKER`, preservando RLS del caller;
+- una prueba crea más de 50 salidas no coincidentes y demuestra que una coincidencia posterior no se pierde por el límite;
+- la pantalla usa un contexto de agencia explícito cuando el usuario pertenece a varias organizaciones.
 
-`package.json` declara:
+### Comisión
 
-- Next.js 16.3.4
-- React / React DOM 19.2.4
-- `@supabase/ssr ^0.12.7`
-- `@supabase/supabase-js ^2.116.0`
-- Tailwind CSS 4
-- TypeScript 5
+- `agencies.commission_rate` es la fuente de verdad;
+- valor por defecto actual: 15%; rango permitido 0..100%;
+- `create_reservation` calcula y persiste la comisión en PostgreSQL;
+- la UI solo muestra una estimación y presenta como definitivos los valores retornados por el RPC;
+- integración validada con una agencia de 20% para demostrar que ya no existe un 15% fijo en el motor.
 
-CI usa Node 22 para la aplicación y acciones de GitHub con runtime moderno. El workflow de integración fija Supabase CLI 2.117.0 para evitar drift de tooling.
+### Admin
 
-## Funcionalidad operacional existente
+- alta de agencias persiste nombre, RUC, contacto, dirección y comisión;
+- alta de tours persiste nombre, descripción y precio base;
+- una agencia no puede ejecutar esas altas por RLS;
+- se eliminaron campos de formularios que no tenían representación en el modelo y se descartaban silenciosamente.
+
+## Funcionalidad operacional actual
 
 ### Auth
 
 - Login email/password con Supabase.
 - Session proxy SSR.
 - Guards server-side para `admin`, `agency`, `operator`.
-- Redirect post-login según rol.
-- `next` solo acepta rutas internas del portal autorizado.
+- Redirect post-login según rol y `next` restringido al portal autorizado.
 - Nuevos usuarios nacen con `role_id = NULL`.
-- R1 añade protección runtime contra cambio de `role_id` por un usuario no admin y RPC administrativo auditable para aprovisionamiento.
+- Cambio de rol operacional requiere admin y RPC auditable.
 
 ### Admin
 
 - Dashboard con datos reales.
-- Agencias: lectura real; alta todavía simulada.
-- Tours: lectura real; alta todavía simulada.
-- Embarcaciones: lectura y alta reales.
+- Agencias: lectura + alta reales.
+- Tours: lectura + alta reales.
+- Embarcaciones: lectura + alta reales.
 - Auditoría: lectura real de `audit_logs`.
-- Settings: mayormente UI sin persistencia/integraciones completas.
+- Pendiente: edición/eliminación, rutas administrables, aprovisionamiento UI de usuarios/membresías y settings persistentes.
 
 ### Agency
 
-- Búsqueda de disponibilidad real.
-- Número de pasajeros se conserva al abrir reserva.
-- Reserva mediante RPC transaccional.
-- Historial real y cancelación mediante RPC.
-- Voucher accesible por token.
+- búsqueda server-side de disponibilidad real;
+- selección explícita de agencia cuando hay múltiples membresías;
+- comisión configurable por agencia;
+- reserva mediante RPC transaccional;
+- historial y cancelación reales;
+- voucher accesible por token.
 
-Deuda: filtro textual todavía debe migrarse a servidor; comisión sigue fija en 15%; falta hold/pago/pasajeros individuales.
+Pendiente: hold con expiración, pago/conciliación, pasajeros individuales y E2E de navegador.
 
 ### Operator
 
-- Gestión de cupos mediante RPC.
-- Lectura/mutación restringida a embarcaciones propias y recursos derivados.
-- Dashboard operativo básico.
-- Falta creación completa de salidas, manifiesto y check-in.
+- gestión de cupos mediante RPC;
+- lectura/mutación restringida a embarcaciones propias y recursos derivados;
+- dashboard operativo básico.
+
+Pendiente: creación completa de salidas, manifiesto y check-in.
 
 ### Voucher
 
-- Token criptográfico.
-- Verificación pública online.
-- Visibilidad autenticada restringida por reserva/ownership.
-- Falta QR visual, PDF operativo, redención, doble-uso, reemisión y offline.
+- token criptográfico generado con pgcrypto;
+- verificación pública online;
+- visibilidad autenticada restringida por reserva/ownership;
+- cancelación deja de verificar como voucher válido.
 
-## Datos y seguridad
+Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline.
 
-Tablas base: roles, profiles, agencies, agencies_users, vessels, routes, tours, availability, reservations, vouchers, audit_logs.
-
-R1 incorpora un gate vivo porque los tests de texto/contrato no pueden demostrar por sí solos que PostgREST, Auth, RLS y `SECURITY DEFINER` interactúan correctamente.
-
-Riesgos abiertos:
+## Riesgos y deuda abierta
 
 - signup productivo debe ser invitation-only o equivalente;
-- password policy local sigue por debajo del objetivo productivo;
-- MFA no configurado;
+- password policy/MFA productivos todavía no están cerrados;
 - operador multiempresa continúa modelado indirectamente por `vessels.owner_id`;
-- todavía falta E2E crítico de navegador.
-
-## Capacidades ausentes para producción completa
-
-- Roles granulares de guía/staff.
-- Organización multiusuario de operadores robusta.
-- CRUD completo de servicios/rutas/salidas.
-- Holds con expiración.
-- Pasajeros individuales/manifiesto.
-- Pagos y conciliación.
-- QR/redención/scanner.
-- Notificaciones reales.
-- Exportaciones/reportes.
-- PWA/offline/sync/outbox.
-- Observabilidad.
-- Cobertura unit/integration/E2E suficiente.
-- Runbook de deploy/rollback probado.
+- falta E2E de navegador login → búsqueda → reserva → voucher;
+- faltan holds, pagos, manifiesto de pasajeros y redención;
+- faltan rutas/salidas CRUD completas;
+- faltan PWA/offline/sync/outbox, observabilidad, reportes y runbook de deploy/rollback probado.
 
 ## Riesgo por área
 
-| Área | Riesgo actual | Prioridad |
+| Área | Estado | Prioridad siguiente |
 |---|---|---|
-| Build reproducible | reparado y verde en `dev` | cerrado S0 |
-| Auth redirect | reparado y testeado | cerrado S0 |
-| RLS/multitenancy | contrato endurecido; prueba runtime R1 activa | P0 |
-| Tests | unit/contract presentes; integración en incorporación | P0 |
-| Búsqueda disponibilidad | filtro cliente tras límite | P1 |
-| Comisión | 15% hardcodeado | P1 |
-| Voucher redemption | no implementado | P1 |
-| Pagos | no implementado | P1 |
-| Offline | no implementado; impacto alto en Galápagos | P1/P2 |
-| Reportes | incompleto | P2 |
+| Build reproducible | verde | mantenimiento |
+| Auth/RLS/multitenancy | 18/18 integración | endurecimiento productivo |
+| Booking engine | reserva/cancelación validadas | holds/pagos |
+| Búsqueda disponibilidad | server-side antes de límite | optimización/índices si escala |
+| Comisión | configurable por agencia | administración/edición |
+| Admin agency/tour create | persistente y RLS validado | edición/eliminación/rutas |
+| E2E browser | ausente | **P0 siguiente** |
+| Voucher redemption | ausente | P1 |
+| Offline | ausente | P1/P2 |
 
 ## Criterio para cambiar a STABLE
 
-Solo cuando existan: CI completo verde, lock reproducible, integración RLS positiva/negativa, E2E del flujo crítico, cero vulnerabilidades critical/high sin excepción aprobada, documentación sincronizada y un entorno de despliegue/rollback probado. `dev` puede seguir avanzando por fases sin declarar `main` productivo antes de cumplir ese criterio.
+Solo cuando existan: CI completo verde, lock reproducible, integración RLS positiva/negativa, E2E del flujo crítico, cero vulnerabilidades critical/high sin excepción aprobada, documentación sincronizada y un entorno de despliegue/rollback probado. R1 mejora sustancialmente el baseline, pero **no cambia todavía `main` a STABLE**.
