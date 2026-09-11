@@ -106,6 +106,9 @@ AS $$
   LIMIT 1;
 $$;
 
+REVOKE ALL ON FUNCTION public.verify_voucher(TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.verify_voucher(TEXT) TO anon, authenticated;
+
 -- ============================================================
 -- 5. Authoritative atomic redemption RPC
 -- ============================================================
@@ -302,6 +305,9 @@ BEGIN
 END;
 $$;
 
+REVOKE ALL ON FUNCTION public.redeem_voucher(TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.redeem_voucher(TEXT) TO authenticated;
+
 -- ============================================================
 -- 6. Explicitly keep voucher verification separate from redemption
 -- ============================================================
@@ -311,4 +317,3 @@ IS 'Read-only public voucher verification. Never consumes a voucher.';
 
 COMMENT ON FUNCTION public.redeem_voucher(TEXT)
 IS 'Authoritative authenticated voucher redemption. Atomic, role-scoped and audited.';
->>>>>>> e6d50f3 (feat(r3): implement voucher redemption flow)
