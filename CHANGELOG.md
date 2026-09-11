@@ -11,6 +11,12 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 - Protocolo auditable para agentes de IA mediante Context Tokens.
 - Tests S0 con `node:test` para routing seguro y contratos de seguridad/RLS.
 - `supabase/seed.sql` mínimo y determinista para que `supabase db reset` tenga un entrypoint válido.
+- Gate `Supabase Integration` con stack local efímero, migraciones + seed y pruebas Auth/RLS/RPC/PostgREST sin secretos remotos.
+- 18 pruebas de integración R1 para aislamiento multi-tenant, ownership, motor de reservas, búsqueda, comisión y permisos de alta administrativa.
+- RPC `assign_user_role(UUID,TEXT)` para aprovisionamiento administrativo auditable.
+- RPC `search_availability(DATE,TEXT,INT)` con filtrado server-side antes de `LIMIT 50`.
+- `agencies.commission_rate` como configuración de comisión por agencia.
+- Alta persistente de agencias y tours desde el área admin.
 
 ### Fixed
 - Sincronización reproducible de `package-lock.json` con Supabase, Next.js 16.3.4 y `eslint-config-next` 16.3.4.
@@ -21,14 +27,24 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 - RLS explícito añadido a `agencies_users`, `routes` y `tours`.
 - Acceso de operador a embarcaciones, disponibilidad, reservas y vouchers restringido por ownership.
 - RPCs `cancel_reservation` y `update_availability_seats` endurecidos con validación explícita de ownership bajo `SECURITY DEFINER`.
+- Autoescalación de `profiles.role_id` bloqueada para usuarios no admin.
+- `INSERT` directo autenticado en `reservations` eliminado para impedir bypass del lock/decremento transaccional.
+- Ambigüedad PL/pgSQL de `available_seats` dentro de `create_reservation` corregida.
+- Generación de token de voucher corregida para usar `extensions.gen_random_bytes(24)` con `search_path` endurecido.
+- Filtro textual de disponibilidad movido del cliente a PostgreSQL para no perder coincidencias fuera de los primeros 50 registros.
+- Comisión fija de 15% eliminada del motor/UI y sustituida por tasa persistida por agencia.
+- Selección arbitraria de la primera membresía de agencia eliminada; el contexto es explícito cuando existen múltiples agencias.
+- Formularios de agencia/tour dejan de simular éxito: persisten y reflejan el registro confirmado por PostgreSQL.
 
 ### Changed
-- CI definido como gate reproducible con `npm ci`, typecheck, auditoría de dependencias, tests y documentación.
+- CI definido como gate reproducible con `npm ci`, typecheck, auditoría de dependencias, tests, build y documentación.
 - El script `test` pasa a ser obligatorio dentro del gate de calidad.
+- Acciones de checkout/setup-node actualizadas a generaciones con runtime moderno.
+- Campos administrativos sin representación real en el modelo fueron retirados de los formularios para no descartar datos silenciosamente.
 
 ### Known issues
-- `main` continúa clasificado como UNSTABLE hasta que S0 sea validado y promovido.
-- Permanecen fuera de S0: QR/redención, pagos, offline-first, CRUD administrativo incompleto y cobertura E2E del flujo completo.
+- `main` continúa clasificado como UNSTABLE aunque S0 esté integrado y R1 tenga gates verdes en su PR.
+- Permanecen pendientes: E2E crítico de navegador, QR/redención, pagos/conciliación, holds, manifiesto/check-in, rutas/salidas CRUD completas, offline-first, observabilidad y deploy/rollback probado.
 
 ## [0.1.0] - 2026-09-10
 
