@@ -45,10 +45,13 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 - Campos administrativos sin representación real en el modelo fueron retirados de los formularios para no descartar datos silenciosamente.
 - `Production Check`, `Documentation Quality` y `Critical E2E` cancelan ejecuciones obsoletas por PR/ref para reducir consumo de GitHub Actions.
 - Playwright del gate E2E se instala de forma transitoria con versión fijada, sin alterar el lockfile principal.
+- R2 quedó integrado en `dev` después de validar en navegador real el flujo comercial crítico completo.
+- El stack Supabase del gate E2E excluye servicios no utilizados para reducir tiempo y consumo de GitHub Actions.
 
 ### Known issues
-- `main` continúa clasificado como UNSTABLE aunque S0/R1 estén integrados y exista un gate E2E del happy path.
+- `main` continúa clasificado como UNSTABLE aunque **S0, R1 y R2 ya están integrados en `dev`**.
 - Permanecen pendientes: E2E negativos/operator, QR/redención, pagos/conciliación, holds, manifiesto/check-in, rutas/salidas CRUD completas, offline-first, observabilidad y deploy/rollback probado.
+- El siguiente frente recomendado es R3: voucher operacional y redención segura.
 
 ## [0.1.0] - 2026-09-10
 

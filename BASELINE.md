@@ -1,14 +1,14 @@
 # BASELINE — Estado actual verificable
 
 **Snapshot:** 2026-09-11  
-**`dev` después de R1:** `ffe7dc3797ef464489b686cb6cdc5a7b8dd2555c`  
+**`dev` después de R2:** `89b638bf71ba7ef855221b8dbdba73f0725db05d`  
 **Clasificación de `main`:** **UNSTABLE / NO PRODUCCIÓN**
 
-Este baseline distingue un `dev` estabilizado de un producto listo para producción. S0 y R1 ya están integrados en `dev`; `main` sigue UNSTABLE porque aún faltan despliegue/rollback probado, redención/pagos y otras capacidades operativas P1. El siguiente gate añade E2E crítico de navegador sobre el flujo comercial real.
+Este baseline distingue un `dev` estabilizado de un producto listo para producción. S0, R1 y R2 ya están integrados en `dev`. `main` sigue UNSTABLE porque aún faltan despliegue/rollback probado, redención operacional, pagos/conciliación y otras capacidades P1.
 
 ## Resumen ejecutivo
 
-R1 cerró integración Supabase y varias deudas funcionales. Su estado integrado tiene:
+El estado actual de `dev` tiene las siguientes garantías verificadas:
 
 | Gate / garantía | Evidencia |
 |---|---|
@@ -20,10 +20,15 @@ R1 cerró integración Supabase y varias deudas funcionales. Su estado integrado
 | TypeScript | **verde** |
 | Tests rápidos S0 | **7/7** |
 | `next build` | **verde** |
-| Supabase local + `db reset` | **verde en PR R1** |
-| Integración Auth/RLS/RPC/PostgREST | **18/18 en PR R1** |
+| Supabase local + `db reset` | **verde en R1** |
+| Integración Auth/RLS/RPC/PostgREST | **18/18 en R1** |
+| Critical E2E browser | **verde en R2** |
 
 La integración reconstruye un stack Supabase efímero desde migraciones + seed y no depende de claves ni datos del proyecto remoto.
+
+## S0 — estabilización: integrado en `dev`
+
+S0 recuperó build reproducible, lockfile coherente, auth por rol, RLS mínimo, seguridad de RPC y gates básicos de producción.
 
 ## R1.1 — seguridad e integración: integrado en `dev`
 
@@ -70,17 +75,26 @@ Los tests vivos detectaron y permitieron corregir dos defectos que build/typeche
 - una agencia no puede ejecutar esas altas por RLS;
 - se eliminaron campos de formularios que no tenían representación en el modelo y se descartaban silenciosamente.
 
-## R2 — gate E2E crítico
+## R2 — Critical E2E: integrado en `dev`
 
-Se incorpora un gate Playwright que usa la aplicación Next.js real y un Supabase local efímero. El flujo cubierto es:
+R2 incorporó un gate Playwright que usa la aplicación Next.js real y un Supabase local efímero. El flujo validado es:
 
-`login agency → membresía → búsqueda → reserva → voucher público → inventario actualizado`
+`login agency → membresía/agencia → búsqueda → reserva → voucher público → inventario actualizado`
 
-El fixture usa precio USD 40, comisión 20%, 10 cupos y reserva de dos pasajeros. La prueba exige total USD 80, comisión USD 16, voucher válido y 8 cupos al volver a buscar.
+El fixture usa precio USD 40, comisión 20%, 10 cupos y reserva de dos pasajeros. La ejecución verde confirmó:
 
-El gate no mockea Auth, PostgREST, RLS, RPC, inventario ni verificación de voucher. Su resultado ejecutado debe tomarse del PR que introduce R2; no se considera validado hasta que `Critical E2E` esté verde.
+- login y redirect correcto a `/agency`;
+- carga de membresía/agencia;
+- búsqueda real de disponibilidad;
+- reserva de 2 pasajeros;
+- total USD 80;
+- comisión USD 16;
+- voucher público válido;
+- decremento de inventario de 10 a 8 cupos.
 
-Para reducir consumo de GitHub Actions, el trabajo se prepara fuera del PR y se agrupa antes de abrirlo. `Production Check`, `Documentation Quality` y `Critical E2E` cancelan ejecuciones obsoletas del mismo PR/ref mediante `concurrency`.
+El gate no mockea Auth, PostgREST, RLS, RPC, inventario ni verificación de voucher. La primera ejecución detectó únicamente un selector E2E demasiado estricto; no fue una regresión funcional. El segundo run pasó completo y el PR #6 fue mergeado a `dev`.
+
+Para reducir consumo de GitHub Actions, `Production Check`, `Documentation Quality` y `Critical E2E` cancelan ejecuciones obsoletas del mismo PR/ref mediante `concurrency`. El stack E2E excluye servicios Supabase que no intervienen en el flujo crítico.
 
 ## Funcionalidad operacional actual
 
@@ -109,7 +123,8 @@ Para reducir consumo de GitHub Actions, el trabajo se prepara fuera del PR y se 
 - comisión configurable por agencia;
 - reserva mediante RPC transaccional;
 - historial y cancelación reales;
-- voucher accesible por token.
+- voucher accesible por token;
+- happy path comercial cubierto por E2E real.
 
 Pendiente: hold con expiración, pago/conciliación, pasajeros individuales y escenarios E2E negativos/cancelación.
 
@@ -150,10 +165,16 @@ Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline
 | Búsqueda disponibilidad | server-side antes de límite | optimización/índices si escala |
 | Comisión | configurable por agencia | administración/edición |
 | Admin agency/tour create | persistente y RLS validado | edición/eliminación/rutas |
-| E2E browser | gate happy-path incorporado; requiere green para merge | negativos + operator/redención |
-| Voucher redemption | ausente | P1 |
+| E2E browser | happy path comercial **verde e integrado** | negativos + operator/redención |
+| Voucher redemption | ausente | **P1 / siguiente frente recomendado** |
 | Offline | ausente | P1/P2 |
+
+## Próximo frente recomendado
+
+**R3 — Voucher operacional / redención**.
+
+Objetivo: convertir el voucher verificable en un instrumento operacional con QR, redención autoritativa, protección contra doble uso, auditoría y cobertura de tests. La lógica crítica debe residir en PostgreSQL/Supabase y respetar RLS/roles existentes.
 
 ## Criterio para cambiar a STABLE
 
-Solo cuando existan: CI completo verde, lock reproducible, integración RLS positiva/negativa, E2E del flujo crítico verde, cero vulnerabilidades critical/high sin excepción aprobada, documentación sincronizada y un entorno de despliegue/rollback probado. El gate E2E elimina una deuda P0 importante, pero **no cambia todavía `main` a STABLE**.
+Solo cuando existan: CI completo verde, lock reproducible, integración RLS positiva/negativa, E2E del flujo crítico verde, cero vulnerabilidades critical/high sin excepción aprobada, documentación sincronizada y un entorno de despliegue/rollback probado. R2 cierra una deuda P0 importante, pero **no cambia todavía `main` a STABLE**.
