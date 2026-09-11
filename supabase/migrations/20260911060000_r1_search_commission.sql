@@ -138,10 +138,10 @@ BEGIN
   v_total := v_tour_price * p_passenger_count;
   v_commission := round(v_total * v_commission_rate, 2);
 
-  UPDATE public.availability
-  SET available_seats = available_seats - p_passenger_count,
+  UPDATE public.availability AS a
+  SET available_seats = a.available_seats - p_passenger_count,
       updated_at = NOW()
-  WHERE id = p_availability_id;
+  WHERE a.id = p_availability_id;
 
   INSERT INTO public.reservations (
     availability_id,
