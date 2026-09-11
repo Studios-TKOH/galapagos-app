@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckCircle, XCircle, ShieldCheck, Users, Calendar, Ship, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -12,7 +12,7 @@ export default function VerifyVoucherPage() {
   const [loading, setLoading] = useState(true);
   const [voucher, setVoucher] = useState<Voucher | null>(null);
   const [error, setError] = useState("");
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     async function verify() {
@@ -23,7 +23,7 @@ export default function VerifyVoucherPage() {
       setLoading(false);
     }
     verify();
-  }, [params.id]);
+  }, [params.id, supabase]);
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white"><div className="text-center"><Loader2 className="w-12 h-12 animate-spin mx-auto text-blue-400" /><p className="mt-4 font-bold">Verificando voucher...</p></div></div>;
 
