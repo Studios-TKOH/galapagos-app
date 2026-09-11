@@ -7,7 +7,7 @@
 
 Plataforma B2B para gestionar disponibilidad, reservas y vouchers digitales de servicios turísticos en las Islas Galápagos. El objetivo del producto es conectar agencias de viaje, operadores turísticos y personal operativo con un flujo simple de inventario → reserva → voucher → validación/redención.
 
-> **Estado actual:** `dev` ya incorporó S0 y tiene CI post-merge verde. `main` todavía NO se considera producción estable porque faltan pruebas de integración/E2E y capacidades operativas P1. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
+> **Estado actual:** `dev` ya incorporó S0. R1 está validado en el PR #5 con Production Check, Documentation Quality y Supabase Integration verdes, incluyendo **18/18 pruebas reales de Auth/RLS/RPC/PostgREST**. `main` todavía NO se considera producción estable porque faltan E2E crítico, deploy/rollback probado y capacidades operativas P1. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
 
 ## Lectura obligatoria antes de modificar código
 
@@ -35,7 +35,7 @@ flowchart LR
 
 Detalles: [docs/architecture/system-overview.md](./docs/architecture/system-overview.md).
 
-## Stack detectado
+## Stack
 
 - Next.js 16.3.4, App Router y Turbopack.
 - React 19.2.4 + TypeScript 5 en modo `strict`.
@@ -49,12 +49,12 @@ Detalles: [docs/architecture/system-overview.md](./docs/architecture/system-over
 | Área | Ruta | Estado |
 |---|---|---|
 | Login | `/` | Funcional; redirect y `next` protegidos por rol |
-| Admin | `/admin` | Parcial |
-| Agencias | `/agency` | Búsqueda/reserva funcional con deuda de filtro server-side |
+| Admin | `/admin` | Parcial; altas reales de agencias/tours/embarcaciones |
+| Agencias | `/agency` | Búsqueda server-side, contexto de agencia, comisión y reserva reales |
 | Reservas agencia | `/agency/reservations` | Funcional parcial |
-| Operador | `/operator` | Parcial; ownership de flota aplicado |
-| Cupos | `/operator/availability` | Funcional parcial |
-| Voucher público | `/verify/[token]` | Validación online; no redención |
+| Operador | `/operator` | Parcial; ownership de flota validado en runtime |
+| Cupos | `/operator/availability` | Funcional parcial; mutación por RPC con ownership |
+| Voucher público | `/verify/[token]` | Validación online y cancelación respetada; no redención |
 
 ## Inicio rápido
 
@@ -81,13 +81,13 @@ npm run changelog:validate
 npm run build
 ```
 
-Para pruebas RLS/RPC reales, con un Supabase local levantado y las credenciales locales exportadas:
+Para pruebas RLS/RPC reales, con un Supabase local levantado y credenciales locales exportadas:
 
 ```bash
 npm run test:integration
 ```
 
-El workflow `Supabase Integration` automatiza ese proceso en PRs relevantes contra `dev`/`main` usando un stack local efímero; no usa secretos del proyecto remoto.
+El workflow `Supabase Integration` automatiza el stack efímero, `db reset`, usuarios/fixtures y **18 pruebas de integración** en PRs relevantes contra `dev`/`main`; no usa secretos del proyecto remoto.
 
 CI debe ser verde antes de mergear a `dev`. `main` requiere además revisión y gate de producción.
 
@@ -112,8 +112,9 @@ Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
 - No merge con build rojo.
 - No cambio de contratos, roles, tablas o comportamiento público sin documentación asociada.
 - Reservas productivas deben pasar por el motor RPC transaccional, no por inserts directos.
+- Cambios de permisos requieren pruebas positivas y negativas contra Supabase real.
 - No automatización productiva de WhatsApp Web; usar APIs autorizadas.
 
 ## Estado de producción
 
-Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). Hasta que integración RLS, E2E crítico, despliegue/rollback y capacidades P1 estén validados, este repositorio debe tratarse como **producto en estabilización**.
+Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). R1 cerró integración RLS y deuda funcional importante, pero hasta que existan E2E crítico, redención/pagos prioritarios y despliegue/rollback probado, este repositorio debe tratarse como **producto en estabilización**.
