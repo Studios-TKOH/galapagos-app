@@ -45,4 +45,4 @@ Un release se considera **completo de producción** solo cuando todos los puntos
 
 ## Cierre de fase
 
-Cuando todos los issues de una fase están cerrados: PR `dev → main`, resumen ejecutivo, evidencia de gates, riesgos residuales, rollback y revisión explícita de `@mikyy12`. No mergear por “fecha objetivo” si falta un gate.
+Cuando todos los issues de una fase están cerrados: PR `dev → main`, resumen ejecutivo, evidencia de gates, riesgos residuales, rollback y revisión explícita de `@LavenderEdit`. No mergear por “fecha objetivo” si falta un gate.

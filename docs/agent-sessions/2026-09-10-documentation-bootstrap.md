@@ -19,7 +19,7 @@ code_inspected:
   - src/lib/supabase
   - supabase/migrations
 assumptions:
-  - "@mikyy12 es el mantenedor de producción porque es el autor activo de los commits recientes y la cuenta observable en el repositorio."
+  - "La identidad de aprobación de producción se verificó al crear el PR: la cuenta conectada es @LavenderEdit."
   - "La rama dev debe nacer desde el HEAD actual de main antes de introducir gobierno documental."
 risks:
   - "El lockfile continúa desincronizado y npm ci debe fallar hasta la reparación P0."
@@ -37,6 +37,8 @@ files_changed:
   - "package.json: solo scripts de calidad"
 commands_run:
   - "inspección GitHub del árbol, commits, CI, archivos y migraciones"
+  - "creación de dev y feature/documentation-quality-system"
+  - "creación del PR #3 hacia dev"
 validation_results:
   - "pendiente de GitHub Actions del PR feature/documentation-quality-system -> dev"
 docs_updated:

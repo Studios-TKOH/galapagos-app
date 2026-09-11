@@ -18,7 +18,7 @@ Las reglas siguientes deben configurarse en GitHub Rulesets/Branch Protection. E
 - Require pull request: ON.
 - Required approvals: mínimo 1.
 - Require review from Code Owners: ON.
-- CODEOWNER global: `@mikyy12`.
+- CODEOWNER global: `@LavenderEdit`.
 - Require status checks: documentación + producción.
 - Require conversation resolution: ON.
 - Require up-to-date branch: ON.

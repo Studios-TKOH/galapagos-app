@@ -1,8 +1,8 @@
 # Production owner. Branch protection on main must require Code Owner review.
-* @mikyy12
+* @LavenderEdit
 
 # Security/data changes always require production owner review.
-/supabase/ @mikyy12
-/src/lib/auth/ @mikyy12
-/src/lib/supabase/ @mikyy12
-/.github/ @mikyy12
+/supabase/ @LavenderEdit
+/src/lib/auth/ @LavenderEdit
+/src/lib/supabase/ @LavenderEdit
+/.github/ @LavenderEdit

@@ -16,7 +16,7 @@ dev
        └─ PR → dev: CI + ≥1 review
                     ↓
                   dev
-                    └─ PR de fase → main: CI + CODEOWNER @mikyy12
+                    └─ PR de fase → main: CI + CODEOWNER @LavenderEdit
 ```
 
 ## Commits
