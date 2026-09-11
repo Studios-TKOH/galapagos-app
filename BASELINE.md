@@ -14,8 +14,13 @@ La base tecnológica es recuperable: Next.js + Supabase, portales separados por 
 
 | Métrica | Estado baseline |
 |---|---|
-| `npm install` | pasa, con vulnerabilidades |
-| ESLint | pasa con warnings |
+| Documentación Quality | **verde** en PR #3 |
+| Salud documental | **100/100; 12/12 módulos; freshness 100%** |
+| Contratos RPC documentados | **5/5 detectados por CI** |
+| Dependencias arquitectónicas declaradas | **16 validadas por CI** |
+| `npm ci` | **falla: lockfile desincronizado** |
+| `npm install` histórico | pasa, con vulnerabilidades |
+| ESLint histórico | pasa con warnings |
 | TypeScript | falla |
 | `next build` | falla por typecheck |
 | Tests automatizados | no configurados |
@@ -38,13 +43,20 @@ La base tecnológica es recuperable: Next.js + Supabase, portales separados por 
 - Tailwind CSS 4
 - TypeScript 5
 
-### Deuda P0
+### Deuda P0 — reproducibilidad confirmada por CI
 
-`package-lock.json` no representa correctamente el `package.json` actual. CI usaba `npm install`, por lo que la resolución no era reproducible. El gate nuevo usa `npm ci` y debe permanecer rojo hasta regenerar el lockfile de forma controlada.
+El nuevo gate ejecutó `npm ci` y falló exactamente porque `package.json` y `package-lock.json` no coinciden. Errores observados:
+
+- faltan `@supabase/ssr@0.12.7` y `@supabase/supabase-js@2.116.0` en lockfile;
+- `next@16.2.9` del lockfile no satisface `next@16.3.4`;
+- `eslint-config-next@16.2.9` no satisface `16.3.4`;
+- múltiples dependencias transitivas de Supabase/Next/Sharp están ausentes o en versiones incompatibles.
+
+El gate debe permanecer rojo hasta regenerar el lockfile de forma controlada y revisar el diff. No sustituir `npm ci` por `npm install` en CI.
 
 ### Vulnerabilidades
 
-El último CI observado reportó **6 vulnerabilidades: 4 high y 2 moderate**. No atribuir paquetes concretos hasta ejecutar `npm audit --json` sobre un lockfile regenerado.
+El CI anterior basado en `npm install` reportó **6 vulnerabilidades: 4 high y 2 moderate**. El nuevo gate de `npm audit --audit-level=high` todavía no puede ejecutarse porque `npm ci` se detiene primero. No atribuir paquetes concretos hasta regenerar el lockfile y ejecutar `npm audit --json`.
 
 ## Funcionalidad operacional existente
 
