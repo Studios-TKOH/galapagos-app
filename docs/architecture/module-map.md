@@ -19,6 +19,7 @@ Este archivo contiene marcadores consumidos por `scripts/docs-health.mjs` y `scr
 
 ## Dependencias permitidas observadas
 
+<!-- ARCH_DEP from=public-app to=auth -->
 <!-- ARCH_DEP from=public-app to=supabase -->
 <!-- ARCH_DEP from=edge-proxy to=supabase -->
 <!-- ARCH_DEP from=admin-app to=admin-ui -->
@@ -38,10 +39,11 @@ Este archivo contiene marcadores consumidos por `scripts/docs-health.mjs` y `scr
 
 ```mermaid
 flowchart LR
-  Public[public-app] --> Supa[supabase]
+  Public[public-app] --> Auth[auth]
+  Public --> Supa[supabase]
   Proxy[edge-proxy] --> Supa
   Admin[admin-app] --> AdminUI[admin-ui]
-  Admin --> Auth[auth]
+  Admin --> Auth
   Admin --> Supa
   Agency[agency-app] --> AgencyUI[agency-ui]
   Agency --> Auth
