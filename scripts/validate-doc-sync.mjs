@@ -7,13 +7,19 @@ const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const exists=p=>fs.existsSync(path.join(root,p));
 const fail=[];
 
-// README/package synchronization.
+// README/package/baseline synchronization.
 const pkg=JSON.parse(read('package.json'));
 const readme=read('README.md');
+const baseline=read('BASELINE.md');
 const clean=v=>String(v??'').replace(/^[~^]/,'');
 for(const [marker,value] of [['PACKAGE_VERSION',pkg.version],['NEXT_VERSION',clean(pkg.dependencies?.next)],['REACT_VERSION',clean(pkg.dependencies?.react)]]){
   if(!readme.includes(`<!-- ${marker}:${value} -->`)) fail.push(`README marker ${marker} must equal ${value}`);
 }
+const readmeStatus=readme.match(/<!-- PROJECT_STATUS:([A-Z_-]+) -->/)?.[1];
+const baselineStatus=/\*\*(STABLE|UNSTABLE)(?:\s*\/[^*]+)?\*\*/.exec(baseline)?.[1];
+if(!readmeStatus) fail.push('README missing PROJECT_STATUS marker');
+if(!baselineStatus) fail.push('BASELINE missing parseable STABLE/UNSTABLE classification');
+if(readmeStatus&&baselineStatus&&readmeStatus!==baselineStatus) fail.push(`README status ${readmeStatus} differs from BASELINE ${baselineStatus}`);
 if(!readme.includes('BASELINE.md')||!readme.includes('INDEX.md')||!readme.includes('AI_CONTEXT.md')) fail.push('README must link BASELINE, INDEX and AI_CONTEXT');
 
 // Parse module and dependency contracts.
@@ -59,4 +65,4 @@ if(base){
 }
 
 if(fail.length){ console.error('Documentation/code validation failed:\n- '+[...new Set(fail)].join('\n- ')); process.exit(1); }
-console.log(`Documentation/code contracts valid. RPCs documented: ${documented.size}; architecture edges: ${depSet.size}.`);
+console.log(`Documentation/code contracts valid. Status: ${readmeStatus}; RPCs documented: ${documented.size}; architecture edges: ${depSet.size}.`);
