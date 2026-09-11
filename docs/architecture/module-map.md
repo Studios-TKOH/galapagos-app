@@ -4,7 +4,7 @@ Este archivo contiene marcadores consumidos por `scripts/docs-health.mjs` y `scr
 
 ## Cobertura documental
 
-<!-- MODULE path=src/app doc=docs/architecture/modules/public-entry.md name=public-app -->
+<!-- MODULE path=src/app/page.tsx doc=docs/architecture/modules/public-entry.md name=public-app -->
 <!-- MODULE path=src/app/admin doc=docs/architecture/modules/admin.md name=admin-app -->
 <!-- MODULE path=src/app/agency doc=docs/architecture/modules/agency.md name=agency-app -->
 <!-- MODULE path=src/app/operator doc=docs/architecture/modules/operator.md name=operator-app -->
