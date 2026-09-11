@@ -26,7 +26,7 @@ El test no sustituye los tests de integración: complementa RLS/RPC verificando 
 
 ## Deuda funcional restante
 
-- falta hold con expiración y política de liberación;
+- hold con expiración e idempotencia disponible en backend; pendiente payment ledger e integración UI;
 - falta pago/conciliación;
 - faltan pasajeros individuales y manifiesto;
 - falta redención operacional del voucher;
@@ -42,3 +42,4 @@ El test no sustituye los tests de integración: complementa RLS/RPC verificando 
 - cerrar un modal de reserva debe descartar PII y estado transitorio local;
 - UI no inventa cupos, comisiones finales ni pagos;
 - una corrección visual no debe debilitar validaciones de reserva ni autorización.
+- los holds no se presentan como pagos ni emiten voucher hasta la confirmación autoritativa;

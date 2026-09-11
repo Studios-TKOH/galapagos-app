@@ -36,6 +36,12 @@ La migración `20260911090000_r3_voucher_redemption.sql` añade el estado del vo
 
 La integración R3 cubre voucher válido, doble uso, concurrencia, token inexistente, reserva cancelada, roles no autorizados, ownership cross-operator, mutación directa bloqueada y auditoría. La UI no usa `service_role`; la redención definitiva siempre depende del RPC. R3 quedó integrado en `dev` mediante el PR #8 con Integration y Critical E2E verdes.
 
+## O2/C3.1 — holds e idempotencia
+
+La migración `20260911100000_o2_holds_idempotency.sql` añade `reservations.idempotency_key` y `request_fingerprint`, una unicidad por usuario y clave, y los RPC `create_reservation_hold(...)` y `confirm_reservation_hold(UUID)`. El primero bloquea disponibilidad, libera holds vencidos, calcula comisión en PostgreSQL y crea estado `held` con `expires_at`; repetir la misma clave devuelve la reserva existente y cambiar el payload produce `IDEMPOTENCY_CONFLICT`. El segundo confirma únicamente un hold vigente y perteneciente al usuario autorizado, emitiendo el voucher de forma atómica.
+
+El release de expirados restaura cupos y audita el cambio como `reservation.expired`. Este slice no representa pagos ni cambia el flujo confirmado existente: la UI adoptará hold → pago → confirmación cuando exista el ledger de pagos.
+
 ## Invariantes
 
 Todo nuevo objeto público debe definir:

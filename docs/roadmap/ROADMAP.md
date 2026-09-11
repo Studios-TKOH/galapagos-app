@@ -9,7 +9,7 @@ Estimaciones en días de ingeniería efectiva para 1 desarrollador familiarizado
 | S0 — Estabilización | **Integrado en `dev`** | build reproducible, auth/RLS endurecidos, CI base verde |
 | R1 — Refactorización/seguridad funcional | **Integrado en `dev`** | 18/18 integración Supabase, búsqueda server-side, comisión y CRUD admin básico |
 | R2 — Checkpoint E2E crítico | **Integrado en `dev`** | happy path agency validado en Chromium contra Supabase real |
-| O2 — Optimización y escalabilidad | **Pendiente / parcialmente adelantado** | búsqueda server-side ya resuelta; quedan índices, observabilidad, idempotencia y rendimiento |
+| O2 — Optimización y escalabilidad | **En progreso** | búsqueda server-side e idempotencia de holds resueltas; quedan observabilidad, rendimiento y último cupo |
 | C3 — Completitud productiva | **En progreso** | R3 voucher operacional integrado; pagos, offline y operación/reporting pendientes |
 
 ### Próximo frente operativo
@@ -24,6 +24,8 @@ R3 ya está integrado en `dev` y validado por integración Supabase y Critical E
 - observabilidad y runbook de deploy/rollback.
 
 R3 no debe degradar RLS, ownership, booking engine ni el E2E comercial ya integrado.
+
+El slice O2/C3.1 ya añade holds expirables, liberación atómica e idempotencia en PostgreSQL. La integración con UI y payment ledger queda deliberadamente separada para no confundir un hold con un cobro.
 
 ## Fase S0 — Estabilización
 

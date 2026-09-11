@@ -23,6 +23,7 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 - UI operacional `/operator/redeem` y QR basado únicamente en el token opaco de verificación.
 - Tests de integración R3 para autorización, ownership, doble uso, concurrencia y estados inválidos.
 - E2E Critical ampliado con login de operador, redención real y bloqueo del segundo uso.
+- Backend O2/C3.1 para holds expirables, liberación de cupos e idempotencia por usuario.
 
 ### Fixed
 - Sincronización reproducible de `package-lock.json` con Supabase, Next.js 16.3.4 y `eslint-config-next` 16.3.4.
@@ -52,6 +53,7 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 - R2 quedó integrado en `dev` después de validar en navegador real el flujo comercial crítico completo.
 - El stack Supabase del gate E2E excluye servicios no utilizados para reducir tiempo y consumo de GitHub Actions.
 - Las mutaciones directas de vouchers quedan bloqueadas; la redención debe pasar por `redeem_voucher(TEXT)`.
+- Los holds no emiten voucher ni representan pago hasta `confirm_reservation_hold(UUID)`.
 
 ### Known issues
 - `main` continúa clasificado como UNSTABLE aunque **S0, R1 y R2 ya están integrados en `dev`**.
