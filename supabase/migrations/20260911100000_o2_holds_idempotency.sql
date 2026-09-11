@@ -177,10 +177,10 @@ BEGIN
   v_commission := ROUND(v_total * v_commission_rate, 2);
   v_expires_at := NOW() + make_interval(secs => p_hold_seconds);
 
-  UPDATE public.availability
-  SET available_seats = available_seats - p_passenger_count,
+    UPDATE public.availability AS a
+    SET available_seats = a.available_seats - p_passenger_count,
       updated_at = NOW()
-  WHERE id = p_availability_id;
+    WHERE a.id = p_availability_id;
 
   INSERT INTO public.reservations (
     availability_id, agency_id, user_id, status, total_price, commission_amount,
