@@ -45,6 +45,8 @@ CREATE INDEX IF NOT EXISTS idx_voucher_redemptions_redeemed_by
 -- ============================================================
 
 DROP POLICY IF EXISTS "vouchers_insert_admin" ON public.vouchers;
+DROP POLICY IF EXISTS "vouchers_update_admin" ON public.vouchers;
+DROP POLICY IF EXISTS "vouchers_delete_admin" ON public.vouchers;
 DROP POLICY IF EXISTS "vouchers_admin_write" ON public.vouchers;
 
 -- ============================================================
@@ -105,6 +107,8 @@ AS $$
   LEFT JOIN public.agencies ag
     ON ag.id = r.agency_id
   WHERE v.qr_code_token = BTRIM(p_token)
+    AND r.status <> 'cancelled'
+    AND v.status NOT IN ('revoked', 'expired')
   LIMIT 1;
 $$;
 
