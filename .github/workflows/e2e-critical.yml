@@ -38,8 +38,8 @@ jobs:
         with:
           version: 2.117.0
 
-      - name: Start isolated Supabase stack
-        run: supabase start
+      - name: Start minimal isolated Supabase stack
+        run: supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
 
       - name: Reset database from migrations and seed
         run: supabase db reset
@@ -58,7 +58,7 @@ jobs:
         run: node tests/e2e/setup-fixture.mjs
 
       - name: Install pinned Playwright runner
-        run: npm install --no-save --package-lock=false @playwright/test@1.55.0
+        run: npm install --no-save --package-lock=false @playwright/test@1.63.0
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium

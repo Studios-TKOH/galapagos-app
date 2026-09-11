@@ -34,14 +34,16 @@ El workflow `Critical E2E` reconstruye Supabase desde cero, crea un fixture dete
 
 No usa mocks para Auth, Data API, RLS, reserva ni voucher.
 
-Playwright se instala de forma transitoria y con versión fijada en ese workflow para no alterar el lockfile principal solo por el runner E2E. Si la suite crece y se convierte en una dependencia cotidiana de desarrollo, debe evaluarse moverlo a `devDependencies` en un cambio explícito.
+Playwright se instala de forma transitoria y con versión fijada en ese workflow para no alterar el lockfile principal solo por el runner E2E. La versión fijada de R2 es `@playwright/test@1.63.0`. Si la suite crece y se convierte en una dependencia cotidiana de desarrollo, debe evaluarse moverlo a `devDependencies` en un cambio explícito.
+
+Para reducir minutos de CI, el gate inicia únicamente los servicios locales necesarios para este flujo: PostgreSQL, Auth, PostgREST y Kong. Studio, Realtime, Storage, Mailpit, Edge Runtime, analytics/vector y servicios auxiliares permanecen excluidos.
 
 ## Ejecución local del E2E
 
 Con Docker y Supabase CLI disponibles:
 
 ```bash
-supabase start
+supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
 supabase db reset
 
 eval "$(supabase status -o env)"
@@ -54,7 +56,7 @@ export E2E_AGENCY_EMAIL="e2e-agency@example.test"
 export E2E_AGENCY_PASSWORD="E2E-Password!42"
 
 node tests/e2e/setup-fixture.mjs
-npm install --no-save --package-lock=false @playwright/test@1.55.0
+npm install --no-save --package-lock=false @playwright/test@1.63.0
 npx playwright install chromium
 npx playwright test --config=playwright.config.mjs
 

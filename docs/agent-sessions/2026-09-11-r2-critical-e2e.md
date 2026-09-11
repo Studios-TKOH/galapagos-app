@@ -50,8 +50,13 @@ commands_run:
   - "node --check tests/e2e/critical-booking.spec.mjs"
   - "workflow/docs validation delegated to PR gates after one grouped commit"
 validation_results:
-  - "static syntax checks prepared before PR"
-  - "runtime E2E result must come from Critical E2E on the PR"
+  - "PR #6 run 1: Documentation Quality verde"
+  - "PR #6 run 1: Production Check verde"
+  - "PR #6 run 1: Supabase start, db reset, fixture y Chromium verdes"
+  - "PR #6 run 1: Critical E2E detectó selector de agencia demasiado estricto; URL /agency sí se alcanzó"
+  - "selector corregido para validar nombre + comisión tal como se renderizan"
+  - "Playwright actualizado de 1.55.0 a 1.63.0"
+  - "stack E2E reducido a servicios necesarios mediante supabase start -x"
 docs_updated:
   - README.md
   - BASELINE.md
@@ -68,7 +73,9 @@ remaining_risks:
 ## Decisiones resumidas
 
 - El E2E usa la aplicación y Supabase reales; solo los datos de prueba son fixtures deterministas.
-- Playwright queda fijado en el workflow y se instala con `--no-save --package-lock=false` para preservar el lockfile autoritativo.
+- Playwright queda fijado en `1.63.0` y se instala con `--no-save --package-lock=false` para preservar el lockfile autoritativo.
 - El fixture crea una agencia, operador, ruta, tour, embarcación y disponibilidad futura; la prueba confirma reserva, voucher y decremento de cupos.
+- El primer run demostró que login y redirect funcionaban; falló únicamente porque el test esperaba el nombre de agencia sin el sufijo visible `· comisión 20%`. Se corrigió el selector, no el producto.
+- El gate excluye servicios Supabase no utilizados para reducir pulls, RAM y minutos de Actions.
 - Los workflows rápidos reciben `concurrency` con `cancel-in-progress`; el workflow Supabase Integration no se modifica en este lote para no disparar una corrida costosa sin cambios de contrato de base.
-- El PR se abre únicamente después del commit agrupado para evitar CI por cada edición intermedia.
+- El PR se abrió únicamente después del commit inicial agrupado; la corrección se consolidó en un solo segundo commit.

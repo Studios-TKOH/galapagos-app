@@ -11,7 +11,7 @@ test('agency login → search → reservation → public voucher', async ({ page
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
 
   await expect(page).toHaveURL(/\/agency$/);
-  await expect(page.getByText('E2E Galapagos Agency', { exact: true })).toBeVisible();
+  await expect(page.getByText(/E2E Galapagos Agency · comisión 20%/)).toBeVisible();
 
   await page.getByLabel('Destino').fill('Puerto Villamil');
   await page.getByLabel('Número de pasajeros').fill('2');
