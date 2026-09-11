@@ -56,7 +56,7 @@ const base=process.env.GITHUB_BASE_REF;
 if(base){
   let changed=[];
   try { changed=execFileSync('git',['diff','--name-only',`origin/${base}...HEAD`],{cwd:root,encoding:'utf8'}).trim().split('\n').filter(Boolean); }
-  catch(e){ fail.push(`Unable to compute PR diff against origin/${base}`); }
+  catch { fail.push(`Unable to compute PR diff against origin/${base}`); }
   const changedSet=new Set(changed);
   const codeChanged=changed.filter(f=>/\.(ts|tsx|sql|mjs)$/.test(f)&&!/[.]test[.]|[.]spec[.]/.test(f));
   for(const file of codeChanged){ const mod=byPath.find(m=>file===m.modulePath||file.startsWith(m.modulePath.endsWith('.ts')?m.modulePath:m.modulePath+'/')); if(mod&&!changedSet.has(mod.doc)) fail.push(`Code changed without module doc update: ${file} -> ${mod.doc}`); }
