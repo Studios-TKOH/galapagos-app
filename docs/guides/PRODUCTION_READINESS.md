@@ -4,25 +4,25 @@ Un release se considera **completo de producción** solo cuando todos los puntos
 
 ## Calidad
 
-- [ ] `npm ci` reproducible.
-- [ ] lint verde sin warnings críticos.
-- [ ] typecheck verde.
-- [ ] build verde.
-- [ ] tests unit/integration/E2E críticos verdes.
+- [x] `npm ci` reproducible.
+- [x] lint verde sin warnings críticos.
+- [x] typecheck verde.
+- [x] build verde.
+- [x] tests unit/integration/E2E críticos verdes.
 - [ ] coverage no inferior a baseline acordado.
 
 ## Seguridad
 
-- [ ] cero vulnerabilidades critical/high sin excepción aprobada con fecha de vencimiento.
-- [ ] RLS probado en todas las tablas expuestas.
-- [ ] multitenancy por organización probado.
-- [ ] secrets fuera de cliente/repo.
+- [x] cero vulnerabilidades critical/high sin excepción aprobada con fecha de vencimiento.
+- [x] RLS probado en todas las tablas expuestas.
+- [x] multitenancy por organización probado.
+- [x] secrets fuera de cliente/repo.
 - [ ] signup/roles productivos controlados.
 
 ## Producto
 
-- [ ] inventario/reserva transaccional e idempotente.
-- [ ] voucher emitible/verificable/redimible.
+- [x] inventario/reserva transaccional e idempotente.
+- [x] voucher emitible/verificable/redimible.
 - [ ] pagos diferenciados de reservas.
 - [ ] cancelación/reprogramación consistente.
 - [ ] journeys de roles principales E2E.
@@ -36,12 +36,12 @@ Un release se considera **completo de producción** solo cuando todos los puntos
 
 ## Documentación
 
-- [ ] salud documental 100% de cobertura.
-- [ ] API contracts sincronizados.
-- [ ] module map sincronizado.
-- [ ] README refleja stack/estado.
-- [ ] BASELINE actualizado al commit de release.
-- [ ] CHANGELOG actualizado.
+- [x] salud documental 100% de cobertura.
+- [x] API contracts sincronizados.
+- [x] module map sincronizado.
+- [x] README refleja stack/estado.
+- [x] BASELINE actualizado al commit de release.
+- [x] CHANGELOG actualizado.
 
 ## Cierre de fase
 
