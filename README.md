@@ -7,7 +7,7 @@
 
 Plataforma B2B para gestionar disponibilidad, reservas y vouchers digitales de servicios turísticos en las Islas Galápagos. El objetivo del producto es conectar agencias de viaje, operadores turísticos y personal operativo con un flujo simple de inventario → reserva → voucher → validación/redención.
 
-> **Estado actual:** `dev` ya incorporó S0 y R1; el merge de R1 quedó validado con Documentation Quality y Production Check verdes, además de las **18/18 pruebas reales de Auth/RLS/RPC/PostgREST** del PR. El siguiente gate incorpora E2E crítico de navegador para login → búsqueda → reserva → voucher. `main` todavía NO se considera producción estable porque faltan deploy/rollback probado y capacidades operativas P1. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
+> **Estado actual:** `dev` ya incorporó **S0, R1 y R2**. La integración R1 mantiene **18/18 pruebas reales de Auth/RLS/RPC/PostgREST** y R2 añadió un **Critical E2E verde** que valida en Chromium el flujo login agency → búsqueda → reserva → voucher → inventario. `main` todavía NO se considera producción estable porque faltan redención operacional, pagos/conciliación, deploy/rollback probado y otras capacidades P1. El siguiente frente recomendado es **R3 — Voucher operacional / redención**. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
 
 ## Lectura obligatoria antes de modificar código
 
@@ -90,7 +90,7 @@ npm run test:integration
 
 El workflow `Supabase Integration` automatiza el stack efímero, `db reset`, usuarios/fixtures y **18 pruebas de integración** en PRs relevantes contra `dev`/`main`; no usa secretos del proyecto remoto.
 
-El workflow `Critical E2E` levanta su propio Supabase local y ejecuta Chromium contra la aplicación real cuando cambian `src`, Supabase o la suite E2E. La guía completa de ejecución local está en [docs/guides/TESTING.md](./docs/guides/TESTING.md).
+El workflow `Critical E2E` levanta un Supabase local mínimo y ejecuta Chromium contra la aplicación real. El happy path integrado en R2 verifica login de agencia, búsqueda, reserva de dos pasajeros, cálculo de comisión, voucher público válido y decremento de inventario. La guía completa de ejecución local está en [docs/guides/TESTING.md](./docs/guides/TESTING.md).
 
 Los workflows de PR usan cancelación de ejecuciones obsoletas donde aplica para evitar consumir minutos en revisiones reemplazadas por un commit más reciente. CI debe ser verde antes de mergear a `dev`. `main` requiere además revisión y gate de producción.
 
@@ -110,7 +110,7 @@ Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
 
 - No bypass de RLS para resolver problemas de permisos.
 - No lógica crítica de inventario en el cliente.
-- No cambios directos a `main`.
+- No cambios directos a `main` ni a `dev`; trabajar mediante rama y PR.
 - No mocks presentados como funcionalidad productiva.
 - No merge con build rojo.
 - No cambio de contratos, roles, tablas o comportamiento público sin documentación asociada.
@@ -118,6 +118,10 @@ Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
 - Cambios de permisos requieren pruebas positivas y negativas contra Supabase real.
 - No automatización productiva de WhatsApp Web; usar APIs autorizadas.
 
+## Próximo frente
+
+**R3 — Voucher operacional / redención** debe convertir el voucher actualmente verificable en un instrumento operacional real: QR, redención autoritativa, anti doble uso, auditoría y pruebas negativas/positivas. Antes de implementar, revisar `BASELINE.md`, `AGENT_PROTOCOL.md`, documentación de Voucher, migraciones y tests actuales.
+
 ## Estado de producción
 
-Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). R1 cerró integración RLS y deuda funcional importante; el gate E2E cubre el happy path comercial crítico. Aun así, hasta que existan redención/pagos prioritarios y despliegue/rollback probado, este repositorio debe tratarse como **producto en estabilización**.
+Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). S0, R1 y R2 están integrados en `dev`, pero hasta que existan redención/pagos prioritarios y despliegue/rollback probado, este repositorio debe tratarse como **producto en estabilización**.

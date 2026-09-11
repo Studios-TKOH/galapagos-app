@@ -2,6 +2,8 @@
 
 El proyecto ya tiene tres capas verificables: tests rápidos con `node:test`, integración real contra Supabase local y un gate E2E crítico de navegador con Playwright. Todavía no existe coverage instrumentada; por tanto el baseline de cobertura sigue siendo **0% medido/no configurado**, no 0% lógico.
 
+**Estado actual:** R2 ya fue mergeado a `dev` y el gate `Critical E2E` terminó verde sobre el flujo comercial crítico. El baseline autoritativo está en `BASELINE.md`.
+
 ## Gates actuales
 
 ### Unit / contract
@@ -33,6 +35,8 @@ El workflow `Critical E2E` reconstruye Supabase desde cero, crea un fixture dete
 7. comprobación de que el inventario pasó de 10 a 8 cupos.
 
 No usa mocks para Auth, Data API, RLS, reserva ni voucher.
+
+R2 confirmó este flujo en verde. La primera ejecución detectó un selector Playwright demasiado estricto para el nombre de la agencia; se corrigió el test sin modificar lógica productiva y el segundo run completó el journey completo.
 
 Playwright se instala de forma transitoria y con versión fijada en ese workflow para no alterar el lockfile principal solo por el runner E2E. La versión fijada de R2 es `@playwright/test@1.63.0`. Si la suite crece y se convierte en una dependencia cotidiana de desarrollo, debe evaluarse moverlo a `devDependencies` en un cambio explícito.
 
@@ -83,13 +87,15 @@ Además del baseline R1:
 
 ### E2E
 
-El happy path agency ya tiene gate. Permanecen:
+El happy path agency ya tiene gate verde e integrado. Permanecen:
 
 - login/guards negativos por rol;
 - cancelación y reprogramación;
 - operador/guide y redención;
 - pagos/conciliación;
 - errores de conectividad y recuperación.
+
+El siguiente frente recomendado, R3, debe añadir pruebas de redención positiva/negativa y protección contra doble uso antes de considerarse completo.
 
 ### Offline E2E
 
