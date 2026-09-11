@@ -1,32 +1,31 @@
 # BASELINE — Estado actual verificable
 
 **Snapshot:** 2026-09-11  
-**`dev` después de S0:** `c444066661db53a6ea80b43daaf728ee02c33d5a`  
-**R1 validado en PR #5:** código `0e93a5fa9ecd159173f076b3d5c3d869d82cb940`  
+**`dev` después de R1:** `ffe7dc3797ef464489b686cb6cdc5a7b8dd2555c`  
 **Clasificación de `main`:** **UNSTABLE / NO PRODUCCIÓN**
 
-Este baseline distingue un `dev` recuperado de un producto listo para producción. S0 ya está integrado en `dev`; R1 está validado en la rama `feature/r1-integration-functional` y pendiente de revisión/merge. `main` sigue UNSTABLE porque aún faltan E2E crítico, despliegue/rollback probado y capacidades operativas P1.
+Este baseline distingue un `dev` estabilizado de un producto listo para producción. S0 y R1 ya están integrados en `dev`; `main` sigue UNSTABLE porque aún faltan despliegue/rollback probado, redención/pagos y otras capacidades operativas P1. El siguiente gate añade E2E crítico de navegador sobre el flujo comercial real.
 
 ## Resumen ejecutivo
 
-R1 cerró el bloque de integración Supabase y varias deudas funcionales que S0 había dejado explícitas. El estado validado tiene los tres gates verdes:
+R1 cerró integración Supabase y varias deudas funcionales. Su estado integrado tiene:
 
-| Gate | Evidencia R1 |
+| Gate / garantía | Evidencia |
 |---|---|
-| Documentation Quality | **verde** |
-| Production Check | **verde** |
+| Documentation Quality post-merge | **verde** |
+| Production Check post-merge | **verde** |
 | `npm ci` | **verde** |
 | `npm audit` | **0 vulnerabilidades** |
 | ESLint | **verde** |
 | TypeScript | **verde** |
 | Tests rápidos S0 | **7/7** |
 | `next build` | **verde** |
-| Supabase local + `db reset` | **verde** |
-| Integración Auth/RLS/RPC/PostgREST | **18/18** |
+| Supabase local + `db reset` | **verde en PR R1** |
+| Integración Auth/RLS/RPC/PostgREST | **18/18 en PR R1** |
 
-La integración usa un stack Supabase efímero reconstruido desde migraciones + seed. No depende de claves ni datos del proyecto remoto.
+La integración reconstruye un stack Supabase efímero desde migraciones + seed y no depende de claves ni datos del proyecto remoto.
 
-## R1.1 — seguridad e integración: cerrado en rama
+## R1.1 — seguridad e integración: integrado en `dev`
 
 Quedaron demostrados en runtime:
 
@@ -45,9 +44,9 @@ Quedaron demostrados en runtime:
 Los tests vivos detectaron y permitieron corregir dos defectos que build/typecheck no podían encontrar:
 
 1. ambigüedad PL/pgSQL en `available_seats` dentro de `create_reservation`;
-2. `gen_random_bytes()` no visible con `search_path = public`; el token ahora usa explícitamente `extensions.gen_random_bytes(24)`.
+2. `gen_random_bytes()` no visible con `search_path = public`; el token usa explícitamente `extensions.gen_random_bytes(24)`.
 
-## R1.2 — funcionalidad inmediata: cerrado en rama
+## R1.2 — funcionalidad inmediata: integrada en `dev`
 
 ### Búsqueda de agencia
 
@@ -70,6 +69,18 @@ Los tests vivos detectaron y permitieron corregir dos defectos que build/typeche
 - alta de tours persiste nombre, descripción y precio base;
 - una agencia no puede ejecutar esas altas por RLS;
 - se eliminaron campos de formularios que no tenían representación en el modelo y se descartaban silenciosamente.
+
+## R2 — gate E2E crítico
+
+Se incorpora un gate Playwright que usa la aplicación Next.js real y un Supabase local efímero. El flujo cubierto es:
+
+`login agency → membresía → búsqueda → reserva → voucher público → inventario actualizado`
+
+El fixture usa precio USD 40, comisión 20%, 10 cupos y reserva de dos pasajeros. La prueba exige total USD 80, comisión USD 16, voucher válido y 8 cupos al volver a buscar.
+
+El gate no mockea Auth, PostgREST, RLS, RPC, inventario ni verificación de voucher. Su resultado ejecutado debe tomarse del PR que introduce R2; no se considera validado hasta que `Critical E2E` esté verde.
+
+Para reducir consumo de GitHub Actions, el trabajo se prepara fuera del PR y se agrupa antes de abrirlo. `Production Check`, `Documentation Quality` y `Critical E2E` cancelan ejecuciones obsoletas del mismo PR/ref mediante `concurrency`.
 
 ## Funcionalidad operacional actual
 
@@ -100,7 +111,7 @@ Los tests vivos detectaron y permitieron corregir dos defectos que build/typeche
 - historial y cancelación reales;
 - voucher accesible por token.
 
-Pendiente: hold con expiración, pago/conciliación, pasajeros individuales y E2E de navegador.
+Pendiente: hold con expiración, pago/conciliación, pasajeros individuales y escenarios E2E negativos/cancelación.
 
 ### Operator
 
@@ -108,7 +119,7 @@ Pendiente: hold con expiración, pago/conciliación, pasajeros individuales y E2
 - lectura/mutación restringida a embarcaciones propias y recursos derivados;
 - dashboard operativo básico.
 
-Pendiente: creación completa de salidas, manifiesto y check-in.
+Pendiente: creación completa de salidas, manifiesto, check-in y E2E operacional.
 
 ### Voucher
 
@@ -124,8 +135,8 @@ Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline
 - signup productivo debe ser invitation-only o equivalente;
 - password policy/MFA productivos todavía no están cerrados;
 - operador multiempresa continúa modelado indirectamente por `vessels.owner_id`;
-- falta E2E de navegador login → búsqueda → reserva → voucher;
 - faltan holds, pagos, manifiesto de pasajeros y redención;
+- faltan E2E negativos, operator/guide, cancelación/reprogramación y offline;
 - faltan rutas/salidas CRUD completas;
 - faltan PWA/offline/sync/outbox, observabilidad, reportes y runbook de deploy/rollback probado.
 
@@ -139,10 +150,10 @@ Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline
 | Búsqueda disponibilidad | server-side antes de límite | optimización/índices si escala |
 | Comisión | configurable por agencia | administración/edición |
 | Admin agency/tour create | persistente y RLS validado | edición/eliminación/rutas |
-| E2E browser | ausente | **P0 siguiente** |
+| E2E browser | gate happy-path incorporado; requiere green para merge | negativos + operator/redención |
 | Voucher redemption | ausente | P1 |
 | Offline | ausente | P1/P2 |
 
 ## Criterio para cambiar a STABLE
 
-Solo cuando existan: CI completo verde, lock reproducible, integración RLS positiva/negativa, E2E del flujo crítico, cero vulnerabilidades critical/high sin excepción aprobada, documentación sincronizada y un entorno de despliegue/rollback probado. R1 mejora sustancialmente el baseline, pero **no cambia todavía `main` a STABLE**.
+Solo cuando existan: CI completo verde, lock reproducible, integración RLS positiva/negativa, E2E del flujo crítico verde, cero vulnerabilidades critical/high sin excepción aprobada, documentación sincronizada y un entorno de despliegue/rollback probado. El gate E2E elimina una deuda P0 importante, pero **no cambia todavía `main` a STABLE**.

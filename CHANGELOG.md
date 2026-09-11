@@ -17,6 +17,8 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 - RPC `search_availability(DATE,TEXT,INT)` con filtrado server-side antes de `LIMIT 50`.
 - `agencies.commission_rate` como configuración de comisión por agencia.
 - Alta persistente de agencias y tours desde el área admin.
+- Gate `Critical E2E` con Chromium para login agency → búsqueda → reserva → voucher público → verificación de decremento de inventario.
+- Fixture E2E determinista sobre Supabase local sin mocks del motor de negocio.
 
 ### Fixed
 - Sincronización reproducible de `package-lock.json` con Supabase, Next.js 16.3.4 y `eslint-config-next` 16.3.4.
@@ -41,10 +43,12 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 - El script `test` pasa a ser obligatorio dentro del gate de calidad.
 - Acciones de checkout/setup-node actualizadas a generaciones con runtime moderno.
 - Campos administrativos sin representación real en el modelo fueron retirados de los formularios para no descartar datos silenciosamente.
+- `Production Check`, `Documentation Quality` y `Critical E2E` cancelan ejecuciones obsoletas por PR/ref para reducir consumo de GitHub Actions.
+- Playwright del gate E2E se instala de forma transitoria con versión fijada, sin alterar el lockfile principal.
 
 ### Known issues
-- `main` continúa clasificado como UNSTABLE aunque S0 esté integrado y R1 tenga gates verdes en su PR.
-- Permanecen pendientes: E2E crítico de navegador, QR/redención, pagos/conciliación, holds, manifiesto/check-in, rutas/salidas CRUD completas, offline-first, observabilidad y deploy/rollback probado.
+- `main` continúa clasificado como UNSTABLE aunque S0/R1 estén integrados y exista un gate E2E del happy path.
+- Permanecen pendientes: E2E negativos/operator, QR/redención, pagos/conciliación, holds, manifiesto/check-in, rutas/salidas CRUD completas, offline-first, observabilidad y deploy/rollback probado.
 
 ## [0.1.0] - 2026-09-10
 
