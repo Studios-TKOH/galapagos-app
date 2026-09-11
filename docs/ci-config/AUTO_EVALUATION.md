@@ -21,10 +21,12 @@ Verifica que versión actual exista en changelog y que un bump de versión en PR
 
 `documentation-quality.yml` corre estos checks sin depender de instalar paquetes. `production-check.yml` agrega instalación reproducible, audit, lint, typecheck, tests y build.
 
+El build de CI define valores placeholder **no secretos** para `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Su único propósito es permitir que Next.js construya/prerenderice componentes que instancian el cliente browser. No representan una instancia real, no habilitan llamadas de producción y no sustituyen la configuración runtime documentada para cada entorno.
+
 ## Baseline validado
 
-En el bootstrap del sistema los checks documentales pasaron con 100/100, 12/12 módulos, 5 contratos RPC y 16 dependencias arquitectónicas. El gate productivo detectó correctamente el lockfile desincronizado mediante `npm ci`.
+Durante S0 los checks documentales alcanzan 100/100, 12/12 módulos y 5 contratos RPC; el mapa actual declara 17 dependencias arquitectónicas. El gate productivo detectó primero el lockfile desincronizado y, tras repararlo, verificó `npm ci` y `npm audit` con 0 vulnerabilidades antes de avanzar a lint/typecheck/tests/build.
 
 ## Fallos intencionales
 
-El sistema debe fallar cuando detecta divergencia. No suavizar reglas para poner CI verde; corregir el contrato o el código.
+El sistema debe fallar cuando detecta divergencia. No suavizar reglas para poner CI verde; corregir el contrato o el código. Los placeholders de build son aceptables porque las variables son públicas y no otorgan acceso a un backend real; nunca introducir secretos reales en workflows versionados.
