@@ -7,7 +7,7 @@
 
 Plataforma B2B para gestionar disponibilidad, reservas y vouchers digitales de servicios turísticos en las Islas Galápagos. El objetivo del producto es conectar agencias de viaje, operadores turísticos y personal operativo con un flujo simple de inventario → reserva → voucher → validación/redención.
 
-> **Estado actual:** `main` NO se considera producción estable. El build de producción falla y existen riesgos de seguridad/multitenancy documentados. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
+> **Estado actual:** `dev` ya incorporó S0 y tiene CI post-merge verde. `main` todavía NO se considera producción estable porque faltan pruebas de integración/E2E y capacidades operativas P1. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
 
 ## Lectura obligatoria antes de modificar código
 
@@ -42,17 +42,17 @@ Detalles: [docs/architecture/system-overview.md](./docs/architecture/system-over
 - Tailwind CSS 4.
 - Supabase SSR / Supabase JS.
 - PostgreSQL + RLS + funciones RPC mediante migraciones Supabase.
-- GitHub Actions para gates de calidad.
+- GitHub Actions para gates de documentación, producción e integración Supabase.
 
 ## Rutas actuales
 
 | Área | Ruta | Estado |
 |---|---|---|
-| Login | `/` | Funcional con bug de redirect por rol |
+| Login | `/` | Funcional; redirect y `next` protegidos por rol |
 | Admin | `/admin` | Parcial |
-| Agencias | `/agency` | Búsqueda/reserva parcial |
+| Agencias | `/agency` | Búsqueda/reserva funcional con deuda de filtro server-side |
 | Reservas agencia | `/agency/reservations` | Funcional parcial |
-| Operador | `/operator` | Parcial |
+| Operador | `/operator` | Parcial; ownership de flota aplicado |
 | Cupos | `/operator/availability` | Funcional parcial |
 | Voucher público | `/verify/[token]` | Validación online; no redención |
 
@@ -67,20 +67,29 @@ supabase db reset
 npm run dev
 ```
 
-**Nota:** en el baseline actual `npm ci` puede fallar porque `package-lock.json` está desincronizado con `package.json`. Esto es un P0 deliberadamente visible, no debe ocultarse usando `npm install` como workaround permanente.
+El lockfile está sincronizado y `npm ci` es la instalación autoritativa. No usar `npm install` para ocultar drift entre `package.json` y `package-lock.json`.
 
 ## Comandos de calidad
 
 ```bash
 npm run lint
 npm run typecheck
+npm test
 npm run docs:validate
 npm run docs:health
 npm run changelog:validate
 npm run build
 ```
 
-CI debe ser verde antes de mergear a `dev`. `main` requiere además revisión del CODEOWNER y gate de producción.
+Para pruebas RLS/RPC reales, con un Supabase local levantado y las credenciales locales exportadas:
+
+```bash
+npm run test:integration
+```
+
+El workflow `Supabase Integration` automatiza ese proceso en PRs relevantes contra `dev`/`main` usando un stack local efímero; no usa secretos del proyecto remoto.
+
+CI debe ser verde antes de mergear a `dev`. `main` requiere además revisión y gate de producción.
 
 ## Flujo Git
 
@@ -102,8 +111,9 @@ Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
 - No mocks presentados como funcionalidad productiva.
 - No merge con build rojo.
 - No cambio de contratos, roles, tablas o comportamiento público sin documentación asociada.
+- Reservas productivas deben pasar por el motor RPC transaccional, no por inserts directos.
 - No automatización productiva de WhatsApp Web; usar APIs autorizadas.
 
 ## Estado de producción
 
-Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). Hasta que todos estén en verde, este repositorio debe tratarse como **producto en estabilización**.
+Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). Hasta que integración RLS, E2E crítico, despliegue/rollback y capacidades P1 estén validados, este repositorio debe tratarse como **producto en estabilización**.
