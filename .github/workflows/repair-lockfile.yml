@@ -1,0 +1,26 @@
+name: Repair Lockfile Artifact
+
+on:
+  push:
+    branches: [fix/s0-stabilization]
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Regenerate package lock
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Validate clean install
+        run: npm ci --ignore-scripts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: repaired-package-lock
+          path: package-lock.json
+          if-no-files-found: error
