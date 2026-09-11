@@ -83,6 +83,8 @@ Además del baseline R1:
 - hold + expiración;
 - idempotencia;
 - redención única;
+- voucher válido, ya redimido, inexistente y cancelado;
+- roles autorizados/no autorizados, ownership de operador y concurrencia de redención;
 - payment ledger.
 
 ### E2E
@@ -91,7 +93,7 @@ El happy path agency ya tiene gate verde e integrado. Permanecen:
 
 - login/guards negativos por rol;
 - cancelación y reprogramación;
-- operador/guide y redención;
+- operador y redención online: login, verificación, confirmación y segundo intento bloqueado;
 - pagos/conciliación;
 - errores de conectividad y recuperación.
 

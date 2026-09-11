@@ -9,6 +9,7 @@ Los marcadores `API_CONTRACT` se comparan automáticamente contra funciones con 
 <!-- API_CONTRACT cancel_reservation(UUID) -->
 <!-- API_CONTRACT update_availability_seats(UUID,INT) -->
 <!-- API_CONTRACT assign_user_role(UUID,TEXT) -->
+<!-- API_CONTRACT redeem_voucher(TEXT) -->
 
 ## `current_user_role()`
 
@@ -41,6 +42,10 @@ Ajusta cupos disponibles validando reservas existentes. Operadores solo pueden m
 ## `assign_user_role(UUID, TEXT)`
 
 Aprovisiona explícitamente `admin`, `agency` u `operator` para un perfil existente. Solo un usuario con rol `admin` puede ejecutarlo. El cambio genera `audit_logs`; un usuario no puede modificar su propio `role_id` para elevar privilegios.
+
+## `redeem_voucher(TEXT)`
+
+Redime un voucher emitido de forma atómica para un usuario autenticado con rol `admin` u `operator`. Bloquea la fila del voucher, rechaza vouchers inexistentes, cancelados, revocados, expirados o ya redimidos, y exige que un operador sea propietario de la embarcación de la salida. Persiste el estado `redeemed`, una fila append-only en `voucher_redemptions` y un evento `audit_logs`; la redención no puede realizarse mediante mutaciones directas del cliente.
 
 ## Cambio de contrato
 

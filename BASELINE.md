@@ -155,6 +155,10 @@ Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline
 - faltan rutas/salidas CRUD completas;
 - faltan PWA/offline/sync/outbox, observabilidad, reportes y runbook de deploy/rollback probado.
 
+## R3 — Voucher operacional en feature branch
+
+La rama `feature/r3-voucher-redemption` contiene una migración append-only para estados `issued/redeemed/revoked/expired`, redención atómica con `FOR UPDATE`, `voucher_redemptions`, auditoría, QR visual, UI `/operator/redeem` y E2E de navegador para operador. La suite de integración cubre autorización, ownership, cancelación, doble uso y concurrencia. Este trabajo todavía no está integrado en `dev`: la CLI puede ejecutarse mediante `npx`, pero Docker no está disponible para ejecutar el reset y la suite real localmente.
+
 ## Riesgo por área
 
 | Área | Estado | Prioridad siguiente |
@@ -166,7 +170,7 @@ Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline
 | Comisión | configurable por agencia | administración/edición |
 | Admin agency/tour create | persistente y RLS validado | edición/eliminación/rutas |
 | E2E browser | happy path comercial **verde e integrado** | negativos + operator/redención |
-| Voucher redemption | ausente | **P1 / siguiente frente recomendado** |
+| Voucher redemption | implementado en feature branch; pendiente CI/integración | **P1 / validación y PR R3** |
 | Offline | ausente | P1/P2 |
 
 ## Próximo frente recomendado

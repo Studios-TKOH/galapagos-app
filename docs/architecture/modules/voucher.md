@@ -1,8 +1,8 @@
 # Módulo Voucher
 
-**Código:** `src/app/verify` y tabla `vouchers`.
+**Código:** `src/app/verify`, `src/app/operator/redeem`, `src/components/voucher` y tablas `vouchers`/`voucher_redemptions`.
 
-Baseline: token aleatorio, asociación con reserva y verificación pública online. Aún no existe QR visual, PDF operativo, estado de redención, reemisión, revocación detallada ni offline.
+Baseline: token aleatorio, QR visual con enlace de verificación, asociación con reserva y verificación pública online. La redención operacional autoritativa está disponible para `admin` y `operator`; PDF, reemisión, revocación detallada y offline siguen pendientes.
 
 ## Estado S0
 
@@ -14,9 +14,14 @@ El hardening S0 restringe la lectura autenticada de vouchers por ownership cuand
 
 `ISSUED → REDEEMED`, con `REVOKED/EXPIRED`, tabla append-only de redenciones e idempotencia. QR offline debe ser firmado y contener datos mínimos.
 
+La ruta `/operator/redeem` permite pegar un token o el contenido de un QR, verificar el voucher y confirmar la redención. La cámara todavía no está integrada; escanear el QR puede abrir directamente la verificación pública y el operador puede pegar su URL en la pantalla operacional.
+
 ## Invariantes
 
 - verificar no consume un voucher hasta que exista el dominio explícito de redención;
 - no exponer PII adicional en el payload público;
+- el QR solo codifica la URL pública con el token opaco existente;
+- la redención requiere `admin` u `operator`, y el operador debe ser propietario de la embarcación;
+- una redención concurrente produce como máximo una fila en `voucher_redemptions`;
 - el cliente Supabase usado por efectos debe mantener identidad estable;
 - cambios de firma de `verify_voucher` deben actualizar `docs/architecture/api-contracts.md`.
