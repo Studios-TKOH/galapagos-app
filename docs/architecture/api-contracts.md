@@ -7,6 +7,7 @@ Los marcadores `API_CONTRACT` se comparan automáticamente contra funciones con 
 <!-- API_CONTRACT create_reservation(UUID,UUID,INT,TEXT,TEXT) -->
 <!-- API_CONTRACT cancel_reservation(UUID) -->
 <!-- API_CONTRACT update_availability_seats(UUID,INT) -->
+<!-- API_CONTRACT assign_user_role(UUID,TEXT) -->
 
 ## `current_user_role()`
 
@@ -20,15 +21,21 @@ Valida token de voucher y devuelve información pública operacional. Actualment
 
 Crea una reserva confirmada de forma atómica, bloquea la fila de disponibilidad, valida cupos, calcula importe/comisión, reduce inventario, crea voucher y audit log.
 
-Limitaciones baseline: comisión hardcodeada; precio depende de tour; no existe hold/pago previo.
+Limitaciones actuales: comisión todavía fija en el motor; precio depende de tour; no existe hold/pago previo.
+
+La tabla `reservations` no admite `INSERT` directo para usuarios autenticados: la creación debe pasar por este RPC para preservar lock de cupos, validación de agencia y auditoría.
 
 ## `cancel_reservation(UUID)`
 
-Cancela y devuelve cupos. Debe evolucionar con políticas de cancelación, ownership por organización e idempotencia.
+Cancela y devuelve cupos. Valida ownership de agencia/operador dentro del propio RPC porque es `SECURITY DEFINER`.
 
 ## `update_availability_seats(UUID, INT)`
 
-Ajusta cupos disponibles validando reservas existentes. Solo operadores autorizados/admin deberían modificar recursos que pertenecen a su organización.
+Ajusta cupos disponibles validando reservas existentes. Operadores solo pueden modificar disponibilidad de embarcaciones cuyo `owner_id` coincide con el usuario autenticado; admin conserva alcance global.
+
+## `assign_user_role(UUID, TEXT)`
+
+Aprovisiona explícitamente `admin`, `agency` u `operator` para un perfil existente. Solo un usuario con rol `admin` puede ejecutarlo. El cambio genera `audit_logs`; un usuario no puede modificar su propio `role_id` para elevar privilegios.
 
 ## Cambio de contrato
 
