@@ -1,0 +1,2 @@
+-- R3 voucher redemption migration.
+-- See PR for authoritative redemption, lifecycle state, audit and RLS hardening.
