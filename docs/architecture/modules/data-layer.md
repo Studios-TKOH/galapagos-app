@@ -4,12 +4,25 @@
 
 PostgreSQL/Supabase es la fuente de verdad. Las migraciones son append-only: no editar una migración histórica ya aplicada para cambiar comportamiento; crear una nueva.
 
-## Estado S0
+## Estado después de S0
 
-- `package-lock.json` fue regenerado en runner limpio y ya representa las dependencias declaradas en `package.json`; CI mantiene `npm ci` como instalación autoritativa.
-- Existe `supabase/seed.sql`, deliberadamente mínimo, para satisfacer el reset reproducible sin introducir datos productivos falsos.
-- La migración `20260911051000_s0_security_stabilization.sql` completa RLS explícito para `agencies_users`, `routes` y `tours` y restringe recursos operativos por ownership.
-- `cancel_reservation` y `update_availability_seats` conservan sus firmas públicas pero incorporan checks de ownership internos adecuados para `SECURITY DEFINER`.
+- `package-lock.json` es reproducible y CI usa `npm ci` como instalación autoritativa.
+- `supabase/seed.sql` es deliberadamente mínimo para resets reproducibles sin introducir datos productivos falsos.
+- `20260911051000_s0_security_stabilization.sql` completa RLS explícito para `agencies_users`, `routes` y `tours` y restringe recursos operativos por ownership.
+- `cancel_reservation` y `update_availability_seats` validan ownership dentro del propio `SECURITY DEFINER`.
+- El CI post-merge de S0 en `dev` pasó instalación, audit, lint, typecheck, tests y build.
+
+## R1 — integración real
+
+La migración `20260911054000_r1_integration_hardening.sql` añade:
+
+- guard de cambios de `profiles.role_id` para impedir escalación de privilegios por autoedición;
+- RPC auditable `assign_user_role(UUID,TEXT)` reservado a admin;
+- eliminación de la policy de `INSERT` directo en `reservations`, obligando a usar `create_reservation`.
+
+`.github/workflows/supabase-integration.yml` levanta Supabase local mediante CLI fijado a `2.117.0`, aplica migraciones/seed con reset y ejecuta `tests/integration/*.test.mjs` usando claves locales efímeras. No requiere secretos ni acceso al proyecto Supabase remoto.
+
+La suite crea fixtures en runtime para admin, agencia A/B y operador A/B y prueba casos positivos/negativos de RLS, RPC y ownership. Los fixtures no se almacenan en `seed.sql` y desaparecen al destruir el stack de CI.
 
 ## Invariantes
 
