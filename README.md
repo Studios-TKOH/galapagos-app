@@ -7,7 +7,7 @@
 
 Plataforma B2B para gestionar disponibilidad, reservas y vouchers digitales de servicios turísticos en las Islas Galápagos. El objetivo del producto es conectar agencias de viaje, operadores turísticos y personal operativo con un flujo simple de inventario → reserva → voucher → validación/redención.
 
-> **Estado actual:** `dev` ya incorporó S0. R1 está validado en el PR #5 con Production Check, Documentation Quality y Supabase Integration verdes, incluyendo **18/18 pruebas reales de Auth/RLS/RPC/PostgREST**. `main` todavía NO se considera producción estable porque faltan E2E crítico, deploy/rollback probado y capacidades operativas P1. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
+> **Estado actual:** `dev` ya incorporó S0 y R1; el merge de R1 quedó validado con Documentation Quality y Production Check verdes, además de las **18/18 pruebas reales de Auth/RLS/RPC/PostgREST** del PR. El siguiente gate incorpora E2E crítico de navegador para login → búsqueda → reserva → voucher. `main` todavía NO se considera producción estable porque faltan deploy/rollback probado y capacidades operativas P1. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
 
 ## Lectura obligatoria antes de modificar código
 
@@ -42,7 +42,8 @@ Detalles: [docs/architecture/system-overview.md](./docs/architecture/system-over
 - Tailwind CSS 4.
 - Supabase SSR / Supabase JS.
 - PostgreSQL + RLS + funciones RPC mediante migraciones Supabase.
-- GitHub Actions para gates de documentación, producción e integración Supabase.
+- GitHub Actions para gates de documentación, producción, integración Supabase y E2E crítico.
+- Playwright fijado en CI para el gate de navegador, sin incorporarlo todavía al lockfile principal.
 
 ## Rutas actuales
 
@@ -81,7 +82,7 @@ npm run changelog:validate
 npm run build
 ```
 
-Para pruebas RLS/RPC reales, con un Supabase local levantado y credenciales locales exportadas:
+Para pruebas RLS/RPC reales, con un Supabase local levantado y las credenciales locales exportadas:
 
 ```bash
 npm run test:integration
@@ -89,7 +90,9 @@ npm run test:integration
 
 El workflow `Supabase Integration` automatiza el stack efímero, `db reset`, usuarios/fixtures y **18 pruebas de integración** en PRs relevantes contra `dev`/`main`; no usa secretos del proyecto remoto.
 
-CI debe ser verde antes de mergear a `dev`. `main` requiere además revisión y gate de producción.
+El workflow `Critical E2E` levanta su propio Supabase local y ejecuta Chromium contra la aplicación real cuando cambian `src`, Supabase o la suite E2E. La guía completa de ejecución local está en [docs/guides/TESTING.md](./docs/guides/TESTING.md).
+
+Los workflows de PR usan cancelación de ejecuciones obsoletas donde aplica para evitar consumir minutos en revisiones reemplazadas por un commit más reciente. CI debe ser verde antes de mergear a `dev`. `main` requiere además revisión y gate de producción.
 
 ## Flujo Git
 
@@ -117,4 +120,4 @@ Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
 
 ## Estado de producción
 
-Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). R1 cerró integración RLS y deuda funcional importante, pero hasta que existan E2E crítico, redención/pagos prioritarios y despliegue/rollback probado, este repositorio debe tratarse como **producto en estabilización**.
+Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). R1 cerró integración RLS y deuda funcional importante; el gate E2E cubre el happy path comercial crítico. Aun así, hasta que existan redención/pagos prioritarios y despliegue/rollback probado, este repositorio debe tratarse como **producto en estabilización**.

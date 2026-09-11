@@ -18,13 +18,19 @@ La autorización de cancelación está endurecida en PostgreSQL: una agencia sol
 - `agencies.commission_rate` es la fuente de verdad de la comisión. La UI la muestra como estimación y `create_reservation` vuelve a calcular el importe en PostgreSQL al confirmar.
 - El resultado exitoso usa `total_price` y `commission_amount` retornados por el RPC, evitando presentar como definitivo un cálculo exclusivamente cliente.
 
+## R2 — cobertura E2E crítica
+
+El flujo `login agency → búsqueda → reserva → voucher` queda cubierto por un navegador Chromium real contra una instancia Supabase efímera. El fixture usa una agencia con comisión de 20%, una salida con 10 cupos y precio base de USD 40; la prueba confirma reserva de dos pasajeros, voucher público válido y decremento final a 8 cupos.
+
+El test no sustituye los tests de integración: complementa RLS/RPC verificando que el contrato funciona desde la interfaz hasta PostgreSQL y de vuelta a la pantalla pública.
+
 ## Deuda funcional restante
 
 - falta hold con expiración y política de liberación;
 - falta pago/conciliación;
 - faltan pasajeros individuales y manifiesto;
 - falta redención operacional del voucher;
-- falta E2E de navegador para login → búsqueda → reserva → voucher.
+- faltan E2E negativos, cancelación/reprogramación y flujos operator/guide.
 
 ## Invariantes
 
