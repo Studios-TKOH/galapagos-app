@@ -1,40 +1,59 @@
 # BASELINE — Estado actual verificable
 
-**Snapshot:** 2026-09-10  
+**Snapshot de producción:** 2026-09-10  
 **Referencia inicial:** `main@e0be4f592e5cac1b282a10afa1184829c68782fa`  
-**Clasificación:** **UNSTABLE / NO PRODUCCIÓN**
+**Clasificación de `main`:** **UNSTABLE / NO PRODUCCIÓN**
 
-Este archivo debe actualizarse cuando cambie materialmente el estado de salud del proyecto. No describe la aspiración; describe lo que existe.
+Este archivo separa deliberadamente el estado de `main` del trabajo de estabilización todavía no promovido. No declarar STABLE hasta que el PR de S0 tenga CI completo verde y sea integrado mediante el flujo aprobado.
 
 ## Resumen ejecutivo
 
-La base tecnológica es recuperable: Next.js + Supabase, portales separados por rol y un motor de reservas atómico en PostgreSQL. Sin embargo, `main` no produce build de producción, el lockfile está desincronizado, no existe suite automatizada de tests, el aislamiento multiempresa/RLS es incompleto y varias pantallas administrativas son UI sin persistencia.
+La base tecnológica es recuperable: Next.js + Supabase, portales separados por rol y un motor de reservas atómico en PostgreSQL. `main` sigue siendo el baseline roto auditado, pero la rama `fix/s0-stabilization` ya contiene reparaciones para reproducibilidad, TypeScript/auth y hardening RLS que deben validarse antes de promoción.
 
-## Build y CI
+## Estado de `main` auditado
 
 | Métrica | Estado baseline |
 |---|---|
-| Documentación Quality | **verde** en PR #3 |
-| Salud documental | **100/100; 12/12 módulos; freshness 100%** |
-| Contratos RPC documentados | **5/5 detectados por CI** |
-| Dependencias arquitectónicas declaradas | **16 validadas por CI** |
-| `npm ci` | **falla: lockfile desincronizado** |
-| `npm install` histórico | pasa, con vulnerabilidades |
-| ESLint histórico | pasa con warnings |
-| TypeScript | falla |
-| `next build` | falla por typecheck |
+| Documentation Quality | verde en el sistema de gobierno |
+| Salud documental | 100/100; 12/12 módulos; freshness 100% |
+| Contratos RPC documentados | 5/5 detectados por CI |
+| Dependencias arquitectónicas declaradas | 16 validadas por CI |
+| `npm ci` | fallaba por lockfile desincronizado |
+| TypeScript | fallaba |
+| `next build` | fallaba por typecheck |
 | Tests automatizados | no configurados |
-| Coverage instrumentada | **0% medido / no configurado** |
 | CI de producción | rojo |
 
-### Errores bloqueantes conocidos
+## S0 — estabilización bajo validación
 
-1. `src/components/agency/BookingModal.tsx`: `tour` potencialmente `null` dentro de closure async.
-2. `src/lib/supabase/proxy.ts`: acceso inseguro a `data.claims` de `getClaims()`.
+En `fix/s0-stabilization` se han aplicado los siguientes cambios sin declarar todavía producción estable:
+
+- `package-lock.json` regenerado en runner limpio y validado con `npm ci`.
+- `BookingModal.tsx`: se conserva una referencia no-null antes del closure async.
+- `src/lib/supabase/proxy.ts`: `getClaims()` tolera `data=null`/error sin desestructuración insegura.
+- Login: resolución de portal por rol; `next` solo se acepta dentro del área del rol autenticado.
+- Nuevos perfiles: `role_id=NULL` hasta asignación administrativa; no existe rol operacional implícito.
+- RLS explícito para `agencies_users`, `routes`, `tours`.
+- Operadores limitados a su propia flota en vessels/availability/reservations/vouchers.
+- RPCs `cancel_reservation` y `update_availability_seats` validan ownership explícitamente porque `SECURITY DEFINER` puede saltarse RLS del caller.
+- `supabase/seed.sql` existe y es determinista/minimalista.
+- Suite mínima S0 añadida con `node:test` para routing y contratos de seguridad.
+
+### Estado de validación S0
+
+| Gate | Estado |
+|---|---|
+| Lockfile reproducible | **reparado; requiere CI final de PR** |
+| Documentación ↔ código | en ejecución continua |
+| Typecheck | pendiente de corrida final tras todos los cambios |
+| Tests S0 | pendiente de corrida final de PR |
+| Dependency audit | pendiente tras instalación limpia |
+| Production build | pendiente de corrida final |
+| RLS local/integration reset | contrato SQL cubierto; integración Supabase completa pendiente |
 
 ## Dependencias
 
-`package.json` declara actualmente:
+`package.json` declara:
 
 - Next.js 16.3.4
 - React / React DOM 19.2.4
@@ -43,20 +62,11 @@ La base tecnológica es recuperable: Next.js + Supabase, portales separados por 
 - Tailwind CSS 4
 - TypeScript 5
 
-### Deuda P0 — reproducibilidad confirmada por CI
+El lockfile de S0 contiene estas dependencias y versiones coherentes. CI debe seguir usando `npm ci`; no volver a `npm install` como mecanismo de ocultación de drift.
 
-El nuevo gate ejecutó `npm ci` y falló exactamente porque `package.json` y `package-lock.json` no coinciden. Errores observados:
+## Vulnerabilidades
 
-- faltan `@supabase/ssr@0.12.7` y `@supabase/supabase-js@2.116.0` en lockfile;
-- `next@16.2.9` del lockfile no satisface `next@16.3.4`;
-- `eslint-config-next@16.2.9` no satisface `16.3.4`;
-- múltiples dependencias transitivas de Supabase/Next/Sharp están ausentes o en versiones incompatibles.
-
-El gate debe permanecer rojo hasta regenerar el lockfile de forma controlada y revisar el diff. No sustituir `npm ci` por `npm install` en CI.
-
-### Vulnerabilidades
-
-El CI anterior basado en `npm install` reportó **6 vulnerabilidades: 4 high y 2 moderate**. El nuevo gate de `npm audit --audit-level=high` todavía no puede ejecutarse porque `npm ci` se detiene primero. No atribuir paquetes concretos hasta regenerar el lockfile y ejecutar `npm audit --json`.
+El CI histórico reportó **6 vulnerabilidades: 4 high y 2 moderate** sobre una resolución no reproducible. Esa cifra no debe considerarse el estado final de S0. El gate `npm audit --audit-level=high` se ejecutará sobre el lockfile reparado y cualquier high/critical restante bloqueará promoción salvo excepción documentada.
 
 ## Funcionalidad operacional existente
 
@@ -65,7 +75,8 @@ El CI anterior basado en `npm install` reportó **6 vulnerabilidades: 4 high y 2
 - Login email/password con Supabase.
 - Session proxy SSR.
 - Guards server-side para `admin`, `agency`, `operator`.
-- Bug: login sin `next` redirige a `/admin` aunque el usuario no sea admin.
+- En S0: redirect post-login por rol y validación segura de `next`.
+- En S0: cuentas sin rol operativo son cerradas tras login y deben ser aprovisionadas explícitamente.
 
 ### Admin
 
@@ -84,35 +95,38 @@ El CI anterior basado en `npm install` reportó **6 vulnerabilidades: 4 high y 2
 - Cancelación mediante RPC.
 - Voucher accesible por token.
 
-Problemas: filtro destino después de `LIMIT 50`; número de pasajeros se pierde al abrir modal; comisión 15% hardcodeada; estado del modal puede persistir entre reservas.
+Deuda restante: filtro destino después de `LIMIT 50`; número de pasajeros del buscador aún no se transfiere al modal; comisión 15% hardcodeada; falta hold/pago/pasajeros individuales.
 
 ### Operator
 
-- Gestión de cupos existente mediante RPC `update_availability_seats`.
+- Gestión de cupos mediante RPC `update_availability_seats`.
 - Dashboard operativo básico.
+- En S0: lectura y mutaciones quedan restringidas por ownership de embarcación.
 - No hay creación completa de salidas ni manifiesto/check-in.
 
 ### Voucher
 
-- Token criptográfico y endpoint/página pública de verificación.
+- Token criptográfico y página pública de verificación.
+- En S0: operadores solo pueden leer vouchers de reservas correspondientes a su propia flota.
 - Sin QR visual, PDF funcional, redención, doble-uso, reemisión ni offline.
 
 ## Datos y seguridad
 
 Tablas base: roles, profiles, agencies, agencies_users, vessels, routes, tours, availability, reservations, vouchers, audit_logs.
 
-Riesgos conocidos:
+S0 cierra los gaps RLS previamente identificados para `routes`, `tours`, `agencies_users` y elimina el acceso operator global a recursos ajenos. Sigue pendiente una suite de integración real con Supabase que demuestre casos positivos/negativos contra una base reseteada.
 
-- Cobertura RLS incompleta o no demostrada para `routes`, `tours`, `agencies_users`.
-- Policies de `operator` demasiado amplias; no aíslan claramente por organización/recurso.
-- Signup local habilitado y password mínimo 6.
-- No MFA.
-- `supabase/config.toml` referencia `./seed.sql`, pero el archivo no está presente.
+Riesgos todavía abiertos:
 
-## Capacidades ausentes para producción
+- configuración productiva de signup debe bloquearse/invitación-only además del hardening de perfil sin rol;
+- password policy local continúa siendo un parámetro de entorno a endurecer para producción;
+- MFA aún no configurado;
+- modelo de organización de operadores sigue representado indirectamente por `vessels.owner_id`, suficiente para S0 pero no necesariamente para el modelo multiempresa final.
+
+## Capacidades ausentes para producción completa
 
 - Roles granulares de guía/staff.
-- Modelo multiempresa robusto.
+- Organización multiusuario de operadores robusta.
 - CRUD completo de servicios/rutas/salidas.
 - Holds con expiración.
 - Pasajeros individuales/manifiesto.
@@ -122,22 +136,22 @@ Riesgos conocidos:
 - Exportaciones/reportes.
 - PWA/offline/sync/outbox.
 - Observabilidad.
-- Unit/integration/E2E tests.
-- Runbook de deploy/rollback probado.
+- Unit/integration/E2E suficientes para los flujos críticos.
+- Runbook de deploy/rollback probado en entorno real.
 
 ## Riesgo por área
 
-| Área | Riesgo | Prioridad |
+| Área | Riesgo actual | Prioridad |
 |---|---|---|
-| Build reproducible | Crítico | P0 |
-| Auth redirect | Alto | P0 |
-| RLS/multitenancy | Crítico | P0 |
-| Tests | Alto | P0/P1 |
-| Voucher redemption | Alto | P1 |
-| Pagos | Alto | P1 |
-| Offline | Alto por contexto Galápagos | P1/P2 |
-| Reportes | Medio | P2 |
+| Build reproducible | S0 reparado, validación final pendiente | P0 |
+| Auth redirect | S0 reparado, tests pendientes de CI | P0 |
+| RLS/multitenancy | hardening S0 aplicado; integración pendiente | P0 |
+| Tests | suite mínima creada, cobertura aún baja | P0/P1 |
+| Voucher redemption | no implementado | P1 |
+| Pagos | no implementado | P1 |
+| Offline | no implementado; alto impacto en Galápagos | P1/P2 |
+| Reportes | incompleto | P2 |
 
 ## Criterio para cambiar a STABLE
 
-Solo cuando: CI completo verde, lock reproducible, RLS testeado, pruebas mínimas automatizadas, flujos críticos E2E, cero vulnerabilidades critical/high sin excepción aprobada y documentación sincronizada.
+Solo cuando: CI completo verde, lock reproducible, RLS testeado con integración positiva/negativa, pruebas mínimas automatizadas, flujo crítico E2E, cero vulnerabilidades critical/high sin excepción aprobada y documentación sincronizada. La estabilización S0 puede cerrar los P0 sin implicar que todas las features de producción ya estén construidas.
