@@ -1,10 +1,10 @@
 # BASELINE — Estado actual verificable
 
 **Snapshot:** 2026-09-11  
-**`dev` después de R2:** `89b638bf71ba7ef855221b8dbdba73f0725db05d`  
+**`dev` después de R3:** `2c09b42e6faa2a580f2a6dae02e76f15c9ced078`
 **Clasificación de `main`:** **UNSTABLE / NO PRODUCCIÓN**
 
-Este baseline distingue un `dev` estabilizado de un producto listo para producción. S0, R1 y R2 ya están integrados en `dev`. `main` sigue UNSTABLE porque aún faltan despliegue/rollback probado, redención operacional, pagos/conciliación y otras capacidades P1.
+Este baseline distingue un `dev` estabilizado de un producto listo para producción. S0, R1, R2 y R3 ya están integrados en `dev`. `main` sigue UNSTABLE porque aún faltan despliegue/rollback probado, pagos/conciliación y otras capacidades P1.
 
 ## Resumen ejecutivo
 
@@ -155,9 +155,9 @@ Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline
 - faltan rutas/salidas CRUD completas;
 - faltan PWA/offline/sync/outbox, observabilidad, reportes y runbook de deploy/rollback probado.
 
-## R3 — Voucher operacional en feature branch
+## R3 — Voucher operacional: integrado en `dev`
 
-La rama `feature/r3-voucher-redemption` contiene una migración append-only para estados `issued/redeemed/revoked/expired`, redención atómica con `FOR UPDATE`, `voucher_redemptions`, auditoría, QR visual, UI `/operator/redeem` y E2E de navegador para operador. La suite de integración cubre autorización, ownership, cancelación, doble uso y concurrencia. Este trabajo todavía no está integrado en `dev`: la CLI puede ejecutarse mediante `npx`, pero Docker no está disponible para ejecutar el reset y la suite real localmente.
+R3 quedó integrado en `dev` mediante el PR #8. La migración append-only añade estados `issued/redeemed/revoked/expired`, redención atómica con `FOR UPDATE`, `voucher_redemptions`, auditoría, QR visual, UI `/operator/redeem` y E2E de navegador para operador. La integración CI cubre autorización, ownership, cancelación, doble uso y concurrencia.
 
 ## Riesgo por área
 
@@ -169,15 +169,15 @@ La rama `feature/r3-voucher-redemption` contiene una migración append-only para
 | Búsqueda disponibilidad | server-side antes de límite | optimización/índices si escala |
 | Comisión | configurable por agencia | administración/edición |
 | Admin agency/tour create | persistente y RLS validado | edición/eliminación/rutas |
-| E2E browser | happy path comercial **verde e integrado** | negativos + operator/redención |
-| Voucher redemption | implementado en feature branch; pendiente CI/integración | **P1 / validación y PR R3** |
+| E2E browser | comercial y redención operacional **verde e integrado** | negativos adicionales |
+| Voucher redemption | integrado y validado en CI | reemisión/offline |
 | Offline | ausente | P1/P2 |
 
 ## Próximo frente recomendado
 
-**R3 — Voucher operacional / redención**.
+**O2/C3 — endurecimiento productivo y operación**.
 
-Objetivo: convertir el voucher verificable en un instrumento operacional con QR, redención autoritativa, protección contra doble uso, auditoría y cobertura de tests. La lógica crítica debe residir en PostgreSQL/Supabase y respetar RLS/roles existentes.
+Objetivo: cerrar pagos/conciliación, holds, operación de salidas, observabilidad y deploy/rollback probado sin degradar las garantías de R3.
 
 ## Criterio para cambiar a STABLE
 

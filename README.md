@@ -7,7 +7,7 @@
 
 Plataforma B2B para gestionar disponibilidad, reservas y vouchers digitales de servicios turísticos en las Islas Galápagos. El objetivo del producto es conectar agencias de viaje, operadores turísticos y personal operativo con un flujo simple de inventario → reserva → voucher → validación/redención.
 
-> **Estado actual:** `dev` ya incorporó **S0, R1 y R2**. La integración R1 mantiene **18/18 pruebas reales de Auth/RLS/RPC/PostgREST** y R2 añadió un **Critical E2E verde** que valida en Chromium el flujo login agency → búsqueda → reserva → voucher → inventario. `main` todavía NO se considera producción estable porque faltan redención operacional, pagos/conciliación, deploy/rollback probado y otras capacidades P1. El siguiente frente recomendado es **R3 — Voucher operacional / redención**. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
+> **Estado actual:** `dev` ya incorporó **S0, R1, R2 y R3**. La integración valida Auth/RLS/RPC/PostgREST, y los gates críticos validan en Chromium el flujo login agency → búsqueda → reserva → voucher → operador → redención única. `main` todavía NO se considera producción estable porque faltan pagos/conciliación, deploy/rollback probado y otras capacidades P1. El siguiente frente recomendado es **O2/C3 — endurecimiento productivo y operación**. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
 
 ## Lectura obligatoria antes de modificar código
 
@@ -121,8 +121,8 @@ Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
 
 ## Próximo frente
 
-**R3 — Voucher operacional / redención** está implementado en esta feature branch a nivel de migración, integración, E2E y UI mínima: QR, redención autoritativa, anti doble uso, auditoría y pruebas negativas/positivas. Falta ejecutar CI contra Supabase/Docker antes de abrir PR.
+**R3 — Voucher operacional / redención** está integrado en `dev`: QR, redención autoritativa, anti doble uso, auditoría, UI operacional y cobertura de integración/E2E.
 
 ## Estado de producción
 
-Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). S0, R1 y R2 están integrados en `dev`, pero hasta que existan redención/pagos prioritarios y despliegue/rollback probado, este repositorio debe tratarse como **producto en estabilización**.
+Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). S0, R1, R2 y R3 están integrados en `dev`, pero hasta que existan pagos/conciliación, controles operativos y despliegue/rollback probado, este repositorio debe tratarse como **producto en estabilización**.
