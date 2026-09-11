@@ -3,7 +3,6 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 const root = process.cwd();
-const mapPath = path.join(root, 'docs/architecture/module-map.md');
 const requiredDocs = ['README.md','INDEX.md','BASELINE.md','AI_CONTEXT.md','AGENT_PROTOCOL.md','CHANGELOG.md'];
 
 function exists(p){ return fs.existsSync(path.join(root,p)); }
