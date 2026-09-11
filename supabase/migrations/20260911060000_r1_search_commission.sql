@@ -167,7 +167,7 @@ BEGIN
     NULL
   ) RETURNING id INTO v_reservation;
 
-  v_token := encode(gen_random_bytes(24), 'hex');
+  v_token := encode(extensions.gen_random_bytes(24), 'hex');
   INSERT INTO public.vouchers (reservation_id, qr_code_token)
   VALUES (v_reservation, v_token);
 
