@@ -2,19 +2,35 @@ name: Production Check
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - run: npm install
-      - run: npm run lint
-      - run: npm run build
+      - name: Documentation contracts
+        run: |
+          node scripts/validate-doc-sync.mjs
+          node scripts/docs-health.mjs
+          node scripts/validate-changelog.mjs
+      - name: Reproducible install
+        run: npm ci
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Tests
+        run: npm test --if-present
+      - name: Production build
+        run: npm run build

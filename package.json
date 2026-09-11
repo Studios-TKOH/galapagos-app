@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "docs:health": "node scripts/docs-health.mjs",
+    "docs:validate": "node scripts/validate-doc-sync.mjs",
+    "changelog:validate": "node scripts/validate-changelog.mjs",
+    "quality": "npm run docs:validate && npm run docs:health && npm run changelog:validate && npm run lint && npm run typecheck && npm run test --if-present && npm run build"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
