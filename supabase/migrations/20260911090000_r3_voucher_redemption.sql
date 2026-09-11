@@ -12,6 +12,8 @@ ALTER TABLE public.vouchers
 ALTER TABLE public.vouchers
   DROP CONSTRAINT IF EXISTS vouchers_status_check;
 
+ALTER TABLE public.vouchers
+  ADD CONSTRAINT vouchers_status_check
   CHECK (status IN ('issued', 'redeemed', 'revoked', 'expired'));
 
 -- ============================================================
