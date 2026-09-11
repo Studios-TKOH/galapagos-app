@@ -30,6 +30,12 @@ La migración `20260911060000_r1_search_commission.sql` añade:
 
 La suite crea fixtures en runtime para admin, agencia A/B y operador A/B y prueba casos positivos/negativos de RLS, RPC y ownership. Una segunda batería crea más de 50 salidas no coincidentes para demostrar que el filtro del buscador ocurre antes del límite y valida que una comisión distinta del 15% se calcule y persista en PostgreSQL. Los fixtures no se almacenan en `seed.sql` y desaparecen al destruir el stack de CI.
 
+## R3 — redención operacional
+
+La migración `20260911090000_r3_voucher_redemption.sql` añade el estado del voucher, los campos de redención y la tabla append-only `voucher_redemptions` con unicidad por voucher. `redeem_voucher(TEXT)` es `SECURITY DEFINER`, exige `admin` u `operator`, valida ownership de embarcación para operadores, bloquea el voucher con `FOR UPDATE`, registra auditoría y concede `EXECUTE` únicamente a `authenticated`. Las policies heredadas de escritura directa sobre `vouchers` se eliminan; la creación continúa ocurriendo dentro de `create_reservation`.
+
+La integración R3 cubre voucher válido, doble uso, concurrencia, token inexistente, reserva cancelada, roles no autorizados, ownership cross-operator, mutación directa bloqueada y auditoría. La UI no usa `service_role`; la redención definitiva siempre depende del RPC.
+
 ## Invariantes
 
 Todo nuevo objeto público debe definir:

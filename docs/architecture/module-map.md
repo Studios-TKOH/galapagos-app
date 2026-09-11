@@ -12,6 +12,7 @@ Este archivo contiene marcadores consumidos por `scripts/docs-health.mjs` y `scr
 <!-- MODULE path=src/components/admin doc=docs/architecture/modules/admin.md name=admin-ui -->
 <!-- MODULE path=src/components/agency doc=docs/architecture/modules/agency.md name=agency-ui -->
 <!-- MODULE path=src/components/operator doc=docs/architecture/modules/operator.md name=operator-ui -->
+<!-- MODULE path=src/components/voucher doc=docs/architecture/modules/voucher.md name=voucher-ui -->
 <!-- MODULE path=src/lib/auth doc=docs/architecture/modules/auth-security.md name=auth -->
 <!-- MODULE path=src/lib/supabase doc=docs/architecture/modules/data-layer.md name=supabase -->
 <!-- MODULE path=supabase/migrations doc=docs/architecture/modules/data-layer.md name=db-migrations -->
@@ -35,6 +36,8 @@ Este archivo contiene marcadores consumidos por `scripts/docs-health.mjs` y `scr
 <!-- ARCH_DEP from=admin-ui to=supabase -->
 <!-- ARCH_DEP from=agency-ui to=supabase -->
 <!-- ARCH_DEP from=operator-ui to=supabase -->
+<!-- ARCH_DEP from=voucher-ui to=supabase -->
+<!-- ARCH_DEP from=verify-app to=voucher-ui -->
 <!-- ARCH_DEP from=auth to=supabase -->
 
 ```mermaid

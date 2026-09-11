@@ -83,6 +83,8 @@ Además del baseline R1:
 - hold + expiración;
 - idempotencia;
 - redención única;
+- voucher válido, ya redimido, inexistente y cancelado;
+- roles autorizados/no autorizados, ownership de operador y concurrencia de redención;
 - payment ledger.
 
 ### E2E

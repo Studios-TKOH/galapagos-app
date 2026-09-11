@@ -19,6 +19,9 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 - Alta persistente de agencias y tours desde el área admin.
 - Gate `Critical E2E` con Chromium para login agency → búsqueda → reserva → voucher público → verificación de decremento de inventario.
 - Fixture E2E determinista sobre Supabase local sin mocks del motor de negocio.
+- Migración R3 con estados de voucher, redención atómica, tabla append-only de redenciones y auditoría.
+- UI operacional `/operator/redeem` y QR basado únicamente en el token opaco de verificación.
+- Tests de integración R3 para autorización, ownership, doble uso, concurrencia y estados inválidos.
 
 ### Fixed
 - Sincronización reproducible de `package-lock.json` con Supabase, Next.js 16.3.4 y `eslint-config-next` 16.3.4.
@@ -47,11 +50,12 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 - Playwright del gate E2E se instala de forma transitoria con versión fijada, sin alterar el lockfile principal.
 - R2 quedó integrado en `dev` después de validar en navegador real el flujo comercial crítico completo.
 - El stack Supabase del gate E2E excluye servicios no utilizados para reducir tiempo y consumo de GitHub Actions.
+- Las mutaciones directas de vouchers quedan bloqueadas; la redención debe pasar por `redeem_voucher(TEXT)`.
 
 ### Known issues
 - `main` continúa clasificado como UNSTABLE aunque **S0, R1 y R2 ya están integrados en `dev`**.
-- Permanecen pendientes: E2E negativos/operator, QR/redención, pagos/conciliación, holds, manifiesto/check-in, rutas/salidas CRUD completas, offline-first, observabilidad y deploy/rollback probado.
-- El siguiente frente recomendado es R3: voucher operacional y redención segura.
+- Permanecen pendientes: E2E operacional de redención, scanner de cámara, pagos/conciliación, holds, manifiesto/check-in, rutas/salidas CRUD completas, offline-first, observabilidad y deploy/rollback probado.
+- R3 está en desarrollo en `feature/r3-voucher-redemption` y requiere validación Supabase local/CI antes de integrarse.
 
 ## [0.1.0] - 2026-09-10
 
