@@ -40,7 +40,13 @@ La integración R3 cubre voucher válido, doble uso, concurrencia, token inexist
 
 La migración `20260911100000_o2_holds_idempotency.sql` añade `reservations.idempotency_key` y `request_fingerprint`, una unicidad por usuario y clave, y los RPC `create_reservation_hold(...)` y `confirm_reservation_hold(UUID)`. El primero bloquea disponibilidad, libera holds vencidos, calcula comisión en PostgreSQL y crea estado `held` con `expires_at`; repetir la misma clave devuelve la reserva existente y cambiar el payload produce `IDEMPOTENCY_CONFLICT`. El segundo confirma únicamente un hold vigente y perteneciente al usuario autorizado, emitiendo el voucher de forma atómica.
 
+La migración de seguimiento `20260912204711_fix_o2_confirm_reservation_hold.sql` corrige una colisión entre nombres de columnas de salida y referencias PL/pgSQL dentro de `confirm_reservation_hold`, calificando las columnas con alias y preservando el contrato RPC. El cambio fue validado con la suite completa de integración O2.
+
 El release de expirados restaura cupos y audita el cambio como `reservation.expired`. Este slice no representa pagos ni cambia el flujo confirmado existente: la UI adoptará hold → pago → confirmación cuando exista el ledger de pagos.
+
+## Validación actual
+
+En `feature/r3-followup`, la integración local se valida con reset completo de Supabase y la suite `tests/integration/*.test.mjs`. El estado actual validado es 38/38 pruebas de integración aprobadas, incluyendo R1, R3, O2 y búsqueda/comisión. La validación de aplicación (`npm run quality`) también cubre documentación, lint, typecheck, pruebas unitarias y build de producción.
 
 ## Invariantes
 
