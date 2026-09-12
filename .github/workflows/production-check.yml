@@ -9,6 +9,11 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      # Build-time public placeholders. Production runtime values must be supplied
+      # by the deployment environment; these values are intentionally non-secret.
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
