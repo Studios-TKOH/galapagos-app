@@ -126,7 +126,7 @@ Para reducir consumo de GitHub Actions, `Production Check`, `Documentation Quali
 - voucher accesible por token;
 - happy path comercial cubierto por E2E real.
 
-Hold con expiración e idempotencia disponible en backend en la rama `feature/o2-holds-idempotency`; pendiente payment ledger, integración UI, pasajeros individuales y escenarios E2E negativos/cancelación.
+Hold con expiración e idempotencia disponible en backend en esta feature branch; pendiente payment ledger, integración UI, pasajeros individuales y escenarios E2E negativos/cancelación.
 
 ### Operator
 
@@ -141,16 +141,17 @@ Pendiente: creación completa de salidas, manifiesto, check-in y E2E operacional
 - token criptográfico generado con pgcrypto;
 - verificación pública online;
 - visibilidad autenticada restringida por reserva/ownership;
-- cancelación deja de verificar como voucher válido.
+- cancelación deja de verificar como voucher válido;
+- redención operacional atómica para operador/admin, con auditoría y protección contra doble uso.
 
-Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline.
+Pendiente: QR visual, PDF operativo, reemisión y offline.
 
 ## Riesgos y deuda abierta
 
 - signup productivo debe ser invitation-only o equivalente;
 - password policy/MFA productivos todavía no están cerrados;
 - operador multiempresa continúa modelado indirectamente por `vessels.owner_id`;
-- faltan holds, pagos, manifiesto de pasajeros y redención;
+- faltan pagos, manifiesto de pasajeros y reemisión/offline de vouchers;
 - faltan E2E negativos, operator/guide, cancelación/reprogramación y offline;
 - faltan rutas/salidas CRUD completas;
 - faltan PWA/offline/sync/outbox, observabilidad, reportes y runbook de deploy/rollback probado.
@@ -159,7 +160,7 @@ Pendiente: QR visual, PDF operativo, redención, doble-uso, reemisión y offline
 
 R3 quedó integrado en `dev` mediante el PR #8. La migración append-only añade estados `issued/redeemed/revoked/expired`, redención atómica con `FOR UPDATE`, `voucher_redemptions`, auditoría, QR visual, UI `/operator/redeem` y E2E de navegador para operador. La integración CI cubre autorización, ownership, cancelación, doble uso y concurrencia.
 
-## O2/C3.1 — Holds e idempotencia en feature branch
+## O2/C3.1 — Holds e idempotencia en esta feature branch
 
 La rama `feature/o2-holds-idempotency` añade `create_reservation_hold`, `confirm_reservation_hold`, liberación de holds expirados y clave idempotente por usuario. La suite Supabase cubre repetición, conflicto de payload, expiración, autorización y concurrencia del último cupo. Requiere CI real antes de integrarse.
 

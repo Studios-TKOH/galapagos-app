@@ -57,8 +57,8 @@ Todos los cambios relevantes del proyecto se registran aquí. Formato inspirado 
 
 ### Known issues
 - `main` continúa clasificado como UNSTABLE aunque **S0, R1 y R2 ya están integrados en `dev`**.
-- Permanecen pendientes: scanner de cámara, pagos/conciliación, holds, manifiesto/check-in, rutas/salidas CRUD completas, offline-first, observabilidad y deploy/rollback probado.
-- R3 está en desarrollo en `feature/r3-voucher-redemption` y requiere validación Supabase local/CI antes de integrarse.
+- Permanecen pendientes: scanner de cámara, pagos/conciliación, integración UI de holds, manifiesto/check-in, rutas/salidas CRUD completas, offline-first, observabilidad y deploy/rollback probado.
+- O2/C3.1 requiere validación Supabase local/CI antes de integrarse en `dev`.
 
 ## [0.1.0] - 2026-09-10
 

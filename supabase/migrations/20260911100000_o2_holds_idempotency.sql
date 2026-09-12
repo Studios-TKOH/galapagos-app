@@ -67,6 +67,8 @@ BEGIN
 END;
 $$;
 
+REVOKE ALL ON FUNCTION public.release_expired_holds(UUID) FROM PUBLIC;
+
 CREATE OR REPLACE FUNCTION public.create_reservation_hold(
   p_availability_id UUID,
   p_agency_id UUID,
