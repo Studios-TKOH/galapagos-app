@@ -269,7 +269,10 @@ BEGIN
   END IF;
 
   IF v_res.status = 'confirmed' THEN
-    SELECT qr_code_token INTO v_token FROM public.vouchers WHERE reservation_id = v_res.id LIMIT 1;
+    SELECT v.qr_code_token INTO v_token
+    FROM public.vouchers AS v
+    WHERE v.reservation_id = v_res.id
+    LIMIT 1;
     RETURN QUERY SELECT v_res.id, v_res.status, v_token, v_res.total_price, v_res.commission_amount;
     RETURN;
   END IF;
