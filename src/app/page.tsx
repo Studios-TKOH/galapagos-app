@@ -1,14 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { Ship, Mail, Key, ArrowRight, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const supabase = useMemo(() => createClient(), []);
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,7 +22,8 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-    window.location.assign(searchParams.get("next") || "/admin");
+    const next = new URLSearchParams(window.location.search).get("next");
+    window.location.assign(next || "/admin");
   }
 
   return (
