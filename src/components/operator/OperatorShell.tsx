@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, CalendarCheck, User, Ship, LogOut, ScanLine } from "lucide-react";
+import { Home, CalendarCheck, User, Ship, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export function OperatorShell({ children }: { children: React.ReactNode }) {
@@ -22,7 +22,6 @@ export function OperatorShell({ children }: { children: React.ReactNode }) {
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 max-w-md mx-auto"><div className="flex justify-around items-center h-16 px-2">
       <Link href="/operator" aria-current={pathname === "/operator" ? "page" : undefined} className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${pathname === "/operator" ? "text-blue-600" : "text-slate-400"}`}><Home className="w-6 h-6" /><span className="text-[10px] font-bold uppercase">Inicio</span></Link>
       <Link href="/operator/availability" aria-current={pathname === "/operator/availability" ? "page" : undefined} className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${pathname === "/operator/availability" ? "text-blue-600" : "text-slate-400"}`}><CalendarCheck className="w-6 h-6" /><span className="text-[10px] font-bold uppercase">Cupos</span></Link>
-      <Link href="/operator/redeem" aria-current={pathname === "/operator/redeem" ? "page" : undefined} className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${pathname === "/operator/redeem" ? "text-blue-600" : "text-slate-400"}`}><ScanLine className="w-6 h-6" /><span className="text-[10px] font-bold uppercase">Redimir</span></Link>
       <button type="button" onClick={logout} className="flex flex-col items-center justify-center w-full h-full space-y-1 text-slate-400 hover:text-red-500"><User className="w-6 h-6" /><span className="text-[10px] font-bold uppercase">Salir</span></button>
     </div></nav>
   </div>;

@@ -1,128 +1,79 @@
-# Galápagos Digital Voucher Platform
+# 🚢 Galapagos System - Proyecto Principal
 
-<!-- PACKAGE_VERSION:0.1.0 -->
-<!-- NEXT_VERSION:16.3.4 -->
-<!-- REACT_VERSION:19.2.4 -->
-<!-- PROJECT_STATUS:UNSTABLE -->
+---
 
-Plataforma B2B para gestionar disponibilidad, reservas y vouchers digitales de servicios turísticos en las Islas Galápagos. El objetivo del producto es conectar agencias de viaje, operadores turísticos y personal operativo con un flujo simple de inventario → reserva → voucher → validación/redención.
+## 🎨 TAREAS PARA EL ASISTENTE DE UI (UI ASSISTANT)
+¡Hola! Si estás leyendo esto, es porque vas a ayudar a pulir la interfaz visual de este proyecto. La estructura base, los componentes pesados y la lógica de enrutamiento ya están listos. 
 
-> **Estado actual:** `dev` ya incorporó **S0, R1, R2 y R3**. La integración valida Auth/RLS/RPC/PostgREST, y los gates críticos validan en Chromium el flujo login agency → búsqueda → reserva → voucher → operador → redención única. `main` todavía NO se considera producción estable porque faltan pagos/conciliación, deploy/rollback probado y otras capacidades P1. El siguiente frente recomendado es **O2/C3 — endurecimiento productivo y operación**. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
+**Para no complicarte la vida, por favor enfócate ÚNICAMENTE en estas tareas:**
 
-## Lectura obligatoria antes de modificar código
+1. **Cacería de Bugs Visuales (QA Visual)**:
+   - Navega por todas las pantallas simulando ser un usuario real. Si ves algún texto desalineado, un botón que se corta en móviles o algo que "se vea raro", corrígelo usando clases de Tailwind.
+2. **Mejora de Animaciones (Smooth UI)**: 
+   - Revisa las transiciones. Añade animaciones suaves en los modales, botones y tarjetas (ej. `transition-all duration-300 ease-in-out`, `hover:scale-105`, `active:scale-95`). El sistema debe sentirse "vivo".
+3. **Modo Oscuro (Dark Mode) Consistente**: 
+   - Busca fondos que se sientan muy brillantes de noche. Asegúrate de que las tarjetas usen `dark:bg-slate-900` o `dark:bg-slate-800` y textos `dark:text-white` o `dark:text-slate-300`.
+4. **Auditoría de Consola y Advertencias**:
+   - Abre las herramientas de desarrollador del navegador (F12) y revisa la consola. Si encuentras advertencias de React (ej. falta de `key` en listas, clases anidadas incorrectas) o errores leves, arréglalos.
+5. **Píldoras, Badges e Íconos**:
+   - Revisa los estados (Confirmado, Pendiente, Cancelado). Asegúrate de que los colores sean consistentes. Todo el proyecto usa `lucide-react`, si ves íconos que no encajan, cámbialos.
+6. **Mejoras de Accesibilidad y UX**:
+   - Si crees que un texto es muy pequeño o un contraste de colores dificulta la lectura, mejóralo. Tu instinto de diseño manda aquí.
 
-1. [INDEX.md](./INDEX.md) — mapa completo del sistema documental.
-2. [BASELINE.md](./BASELINE.md) — estado real, deuda y riesgos conocidos.
-3. [AI_CONTEXT.md](./AI_CONTEXT.md) — reglas técnicas obligatorias.
-4. [AGENT_PROTOCOL.md](./AGENT_PROTOCOL.md) — protocolo para agentes de IA.
-5. [Roadmap](./docs/roadmap/ROADMAP.md) — orden de rescate y evolución.
+**Regla de Oro**: ¡No toques los "hooks" complejos (`useState`, `useEffect`) de lógica de negocio profunda ni el flujo de datos! Concéntrate en la experiencia visual, la fluidez y en arreglar advertencias menores.
 
-Una persona nueva debe poder completar la guía [Onboarding en 15 minutos](./docs/guides/ONBOARDING_15_MIN.md) antes de realizar cambios.
+### 🗺️ Mapa de Rutas Disponibles (UI)
+Para facilitar tus pruebas, aquí tienes todas las rutas que ya están maquetadas en el sistema. Puedes acceder a ellas directamente desde tu navegador (`http://localhost:3000/...`):
 
-## Arquitectura de alto nivel
+**Pública / Autenticación:**
+* `/` - Pantalla de Login (Glassmorphism)
+* `/verify/12345` - Vista Pública de Validación de Vouchers (QR)
 
-```mermaid
-flowchart LR
-  A[Admin Web] --> N[Next.js App Router]
-  B[Agency Web] --> N
-  C[Operator / Scanner PWA futuro] --> N
-  N --> AUTH[Supabase Auth + RLS]
-  N --> RPC[PostgreSQL RPC / Booking Engine]
-  RPC --> DB[(PostgreSQL)]
-  N --> VERIFY[Public Voucher Verification]
-  OFF[IndexedDB + Outbox futuro] -. sync .-> N
-```
+**Panel de Administrador (Root):**
+* `/admin` - Dashboard Principal
+* `/admin/vessels` - Grid de Embarcaciones y Estados
+* `/admin/audit` - Tabla de Historial de Auditoría
 
-Detalles: [docs/architecture/system-overview.md](./docs/architecture/system-overview.md).
+**Portal B2B (Agencias de Viaje):**
+* `/agency` - Buscador de Disponibilidad (con máscara de fecha y reservas)
+* `/agency/reservations` - Historial de Mis Reservas y descarga de vouchers
 
-## Stack
+**App Móvil (Dueños de Embarcación / Capitanes):**
+* `/operator` - Inicio / Dashboard Móvil (Próximo Zarpe)
+* `/operator/availability` - Gestor Táctil de Cupos (+ / -)
 
-- Next.js 16.3.4, App Router y Turbopack.
-- React 19.2.4 + TypeScript 5 en modo `strict`.
-- Tailwind CSS 4.
-- Supabase SSR / Supabase JS.
-- PostgreSQL + RLS + funciones RPC mediante migraciones Supabase.
-- GitHub Actions para gates de documentación, producción, integración Supabase y E2E crítico.
-- Playwright fijado en CI para el gate de navegador, sin incorporarlo todavía al lockfile principal.
+---
+## Getting Started
 
-## Rutas actuales
-
-| Área | Ruta | Estado |
-|---|---|---|
-| Login | `/` | Funcional; redirect y `next` protegidos por rol |
-| Admin | `/admin` | Parcial; altas reales de agencias/tours/embarcaciones |
-| Agencias | `/agency` | Búsqueda server-side, contexto de agencia, comisión y reserva reales |
-| Reservas agencia | `/agency/reservations` | Funcional parcial |
-| Operador | `/operator` | Parcial; ownership de flota validado en runtime |
-| Cupos | `/operator/availability` | Funcional parcial; mutación por RPC con ownership |
-| Redención operador | `/operator/redeem` | Verificación y redención online mediante RPC atómico |
-| Voucher público | `/verify/[token]` | Validación online, QR y estado de redención |
-
-## Inicio rápido
+First, run the development server:
 
 ```bash
-npm ci
-cp .env.example .env.local
-# Configura NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY
-supabase start
-supabase db reset
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-El lockfile está sincronizado y `npm ci` es la instalación autoritativa. No usar `npm install` para ocultar drift entre `package.json` y `package-lock.json`.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Comandos de calidad
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```bash
-npm run lint
-npm run typecheck
-npm test
-npm run docs:validate
-npm run docs:health
-npm run changelog:validate
-npm run build
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-Para pruebas RLS/RPC reales, con un Supabase local levantado y las credenciales locales exportadas:
+## Learn More
 
-```bash
-npm run test:integration
-```
+To learn more about Next.js, take a look at the following resources:
 
-El workflow `Supabase Integration` automatiza el stack efímero, `db reset`, usuarios/fixtures y **18 pruebas de integración** en PRs relevantes contra `dev`/`main`; no usa secretos del proyecto remoto.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-El workflow `Critical E2E` levanta un Supabase local mínimo y ejecuta Chromium contra la aplicación real. El flujo integrado verifica login de agencia, búsqueda, reserva de dos pasajeros, cálculo de comisión, voucher público, login de operador, redención y bloqueo del segundo uso. La guía completa de ejecución local está en [docs/guides/TESTING.md](./docs/guides/TESTING.md). R3 añade integración PostgreSQL para redención, anti doble uso, concurrencia y autorización.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-Los workflows de PR usan cancelación de ejecuciones obsoletas donde aplica para evitar consumir minutos en revisiones reemplazadas por un commit más reciente. CI debe ser verde antes de mergear a `dev`. `main` requiere además revisión y gate de producción.
+## Deploy on Vercel
 
-## Flujo Git
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-```text
-feature/* o fix/*
-      ↓ PR + CI + review
-dev
-      ↓ PR de fase + revisión explícita
-main
-```
-
-Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
-
-## Principios no negociables
-
-- No bypass de RLS para resolver problemas de permisos.
-- No lógica crítica de inventario en el cliente.
-- No cambios directos a `main` ni a `dev`; trabajar mediante rama y PR.
-- No mocks presentados como funcionalidad productiva.
-- No merge con build rojo.
-- No cambio de contratos, roles, tablas o comportamiento público sin documentación asociada.
-- Reservas productivas deben pasar por el motor RPC transaccional, no por inserts directos.
-- Cambios de permisos requieren pruebas positivas y negativas contra Supabase real.
-- No automatización productiva de WhatsApp Web; usar APIs autorizadas.
-
-## Próximo frente
-
-**R3 — Voucher operacional / redención** está integrado en `dev`: QR, redención autoritativa, anti doble uso, auditoría, UI operacional y cobertura de integración/E2E.
-
-## Estado de producción
-
-Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). S0, R1, R2 y R3 están integrados en `dev`, pero hasta que existan pagos/conciliación, controles operativos y despliegue/rollback probado, este repositorio debe tratarse como **producto en estabilización**.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

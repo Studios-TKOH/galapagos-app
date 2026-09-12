@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Search, History, CheckCircle2, XCircle, AlertCircle, RefreshCw, Loader2, Inbox } from "lucide-react";
+import { Search, History, ShieldAlert, CheckCircle2, XCircle, AlertCircle, RefreshCw, Loader2, Inbox } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 type AuditLog = { id: string; action: string; table_name: string | null; record_id: string | null; old_value: unknown; new_value: unknown; created_at: string; user_id: string | null };

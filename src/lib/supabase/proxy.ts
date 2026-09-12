@@ -18,15 +18,15 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const { data, error } = await supabase.auth.getClaims();
-  const claims = error ? undefined : data?.claims;
+  const { data: { claims } } = await supabase.auth.getClaims();
   const pathname = request.nextUrl.pathname;
-  const protectedArea = ["/admin", "/agency", "/operator"].some((area) => pathname === area || pathname.startsWith(`${area}/`));
+  const protectedArea = ["/admin", "/agency", "/operator"].some((area) => pathname.startsWith(area));
 
   if (protectedArea && !claims) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
-    url.searchParams.set("next", pathname);
+    const next = pathname.startsWith("/") ? pathname : "/";
+    url.searchParams.set("next", next);
     return NextResponse.redirect(url);
   }
 
