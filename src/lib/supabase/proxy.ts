@@ -18,7 +18,8 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const { data: { claims } } = await supabase.auth.getClaims();
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const claims = claimsData?.claims;
   const pathname = request.nextUrl.pathname;
   const protectedArea = ["/admin", "/agency", "/operator"].some((area) => pathname.startsWith(area));
 
