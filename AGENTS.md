@@ -1,5 +1,11 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# Agent entrypoint
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+Antes de modificar este repositorio, lee en orden:
+
+1. `README.md`
+2. `BASELINE.md`
+3. `AI_CONTEXT.md`
+4. `AGENT_PROTOCOL.md`
+5. `INDEX.md` y la documentación del módulo afectado
+
+Toda sesión automatizada que cambie código debe crear un Context Token según `templates/AGENT_SESSION_LOG.md`. No se permiten merges directos a `main`, bypass de RLS, ocultar fallos de CI ni cambios de comportamiento sin documentación correspondiente.
