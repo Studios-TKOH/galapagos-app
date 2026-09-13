@@ -1,117 +1,105 @@
 # Roadmap estratificado
 
-Estimaciones en días de ingeniería efectiva para 1 desarrollador familiarizado con el stack; no son compromisos de calendario. Cada fase depende de la anterior salvo tareas explícitamente paralelas.
+Estimaciones en días de ingeniería efectiva para 1 desarrollador familiarizado con el stack; no son compromisos de calendario.
 
-## Estado de avance — 2026-09-11
+## Estado de avance — 2026-09-12
 
 | Bloque | Estado | Resultado principal |
 |---|---|---|
 | S0 — Estabilización | **Integrado en `dev`** | build reproducible, auth/RLS endurecidos, CI base verde |
-| R1 — Refactorización/seguridad funcional | **Integrado en `dev`** | 18/18 integración Supabase, búsqueda server-side, comisión y CRUD admin básico |
-| R2 — Checkpoint E2E crítico | **Integrado en `dev`** | happy path agency validado en Chromium contra Supabase real |
-| O2 — Optimización y escalabilidad | **En progreso** | búsqueda server-side e idempotencia de holds resueltas; quedan observabilidad, rendimiento y último cupo |
-| C3 — Completitud productiva | **En progreso** | R3 voucher operacional integrado; pagos, offline y operación/reporting pendientes |
+| R1 — Seguridad/funcionalidad | **Integrado en `dev`** | búsqueda server-side, comisión, CRUD admin básico e integración real |
+| R2 — Critical E2E | **Integrado en `dev`** | happy path agency validado en Chromium |
+| R3 — Voucher operacional | **Integrado en `dev`** | QR, redención atómica, anti doble uso, auditoría y E2E operator |
+| O2/C3.1 — Holds | **Integrado en `dev`** | expiración, restitución, idempotencia y último cupo concurrente |
+| C3.1 — Payments & Booking Lifecycle | **Siguiente frente** | payment ledger, conciliación y hold → pago → confirmación |
+| C3.3 — Offline-first | Pendiente | PWA, outbox, sync y redención offline |
+| C3.4 — Operación/reporting | Pendiente | manifiestos, reportes y notificaciones |
 
-### Próximo frente operativo
+## Próximo frente operativo
 
-**O2/C3 — endurecimiento productivo y operación**, después de integrar R3.
+La única fuente de alcance inmediato es `docs/roadmap/CURRENT_WORK.md`.
 
-R3 ya está integrado en `dev` y validado por integración Supabase y Critical E2E. El objetivo inmediato es:
+**C3.1 — Payments & Booking Lifecycle** debe:
 
-- holds con expiración e idempotencia;
-- pagos y conciliación separados de reservas;
-- creación completa de salidas y operación de manifiestos;
-- observabilidad y runbook de deploy/rollback.
-
-R3 no debe degradar RLS, ownership, booking engine ni el E2E comercial ya integrado.
-
-El slice O2/C3.1 ya añade holds expirables, liberación atómica e idempotencia en PostgreSQL. La integración con UI y payment ledger queda deliberadamente separada para no confundir un hold con un cobro.
+- separar dinero cobrado de `reservations.total_price`;
+- introducir payment ledger y estados de conciliación;
+- aplicar idempotencia server-side;
+- preparar la transición autoritativa `hold → pago aprobado → confirmación → voucher`;
+- mantener RLS/ownership y auditoría;
+- no inventar un proveedor externo de pagos sin decisión explícita.
 
 ## Fase S0 — Estabilización
 
 **Estado:** completada e integrada en `dev`.  
-**Estimación original:** 3–5 días.  
-**Dependencia:** ninguna.  
-**Objetivo:** recuperar build reproducible y cerrar riesgos críticos.
+**Estimación original:** 3–5 días.
 
-Entregables: corregir errores TypeScript; regenerar lockfile; `npm ci`; resolver high/critical advisories; redirect por rol; cerrar RLS/multitenancy crítico; seed reproducible; tests mínimos de auth/RLS/booking; CI verde.
+Resultado: `npm ci`, audit, lint, typecheck, tests y build verdes; lockfile, auth, RLS y ownership estabilizados.
 
-**Éxito medible alcanzado:** `npm ci`, lint, typecheck, tests, build y audit policy pasan; los P0 iniciales quedaron cerrados.
-
-## Fase R1 — Refactorización controlada
+## Fase R1 — Seguridad y funcionalidad
 
 **Estado:** completada e integrada en `dev`.  
-**Estimación original:** 5–8 días.  
-**Dependencia:** S0.
+**Estimación original:** 5–8 días.
 
-Objetivos ejecutados: integración Supabase viva, hardening de roles/RLS/RPC, búsqueda server-side, comisión por agencia y eliminación de mocks administrativos críticos.
-
-**Resultado:** 18/18 pruebas reales Auth/RLS/RPC/PostgREST y Production Check/Documentation Quality verdes.
-
-La deuda de refactor estructural no queda agotada; extracción de acceso a datos, tipos Supabase generados, validación de env y reducción de casts siguen siendo mejoras válidas cuando no bloqueen frentes productivos prioritarios.
+Resultado: integración Supabase viva, aislamiento multi-tenant, búsqueda server-side, comisión por agencia y eliminación de mocks administrativos críticos.
 
 ## Checkpoint R2 — E2E crítico
 
 **Estado:** completado e integrado en `dev`.
 
-R2 añadió el gate `Critical E2E` con Playwright/Chromium y Supabase efímero. Valida:
+Valida `login agency → búsqueda → reserva → voucher público → inventario actualizado` contra la app Next.js real y Supabase efímero.
 
-`login agency → membresía → búsqueda → reserva → voucher público → inventario actualizado`
+## R3 — Voucher operacional
 
-Resultado validado: precio USD 40, comisión 20%, 10 cupos iniciales, reserva de dos pasajeros, total USD 80, comisión USD 16, voucher válido y 8 cupos finales.
+**Estado:** completado e integrado en `dev`.
 
-Este checkpoint cerró la deuda P0 de ausencia de journey crítico de navegador.
+Incluye QR, `redeem_voucher(TEXT)`, ownership de operador, anti doble uso/concurrencia, auditoría y E2E de redención.
 
-## Fase O2 — Optimización y escalabilidad
+## O2/C3.1 — Holds e idempotencia
 
-**Estimación:** 4–7 días.  
-**Dependencia:** R1.
+**Estado:** completado e integrado en `dev` mediante PR #10.
 
-Objetivos: índices, paginación, observabilidad, cache seguro, idempotencia e instrumentación de rendimiento.
+Incluye `create_reservation_hold(...)`, `confirm_reservation_hold(UUID)`, expiración con restitución de cupos, idempotencia por usuario/clave y protección del último cupo. El gate Supabase final terminó **38/38**.
 
-Parte del alcance se adelantó durante R1: la búsqueda ya filtra en PostgreSQL antes del `LIMIT 50`.
+## C3.1 — Payments & Booking Lifecycle
 
-**Éxito objetivo:** p95 acordado para rutas críticas; logs correlacionables; pruebas de concurrencia de último cupo; idempotencia en operaciones críticas.
+**Estado:** siguiente frente.  
+**Dependencia:** holds O2 integrados.
 
-**DoD:** métricas documentadas y no degradación de seguridad.
+Objetivos:
 
-## Fase C3 — Completitud productiva
+- payment ledger separado de reserva;
+- estados de pago/conciliación;
+- idempotencia y auditoría;
+- transición server-side segura entre hold, pago, confirmación y voucher;
+- tests de tenant scope, repetición y estados inválidos;
+- E2E actualizado cuando cambie el flujo UI.
 
-**Estimación:** 15–25 días, dividida en subfases.  
-**Dependencia:** S0; preferible R1/O2.
+No usar copy/UI de “pagado” mientras no exista evidencia persistida y autoritativa.
 
-### C3.1 Core comercial
-- servicio unificado tour/ferry/transfer;
-- salidas;
-- hold con expiración;
-- pasajeros individuales;
-- comisión configurable — **parcialmente completada en R1**;
-- trazabilidad de pagos.
+## O2 restante — Optimización y operaciones
 
-### C3.2 Voucher operacional
-- QR;
-- PDF/enlace;
-- redención/check-in;
-- anti doble uso;
-- scanner rol guía/staff.
+Después del slice de pagos: observabilidad, índices/performance medidos, sweeper operacional de holds, backup/restore y runbook de deploy/rollback.
 
-**Prioridad actual:** completar los controles productivos alrededor del flujo comercial y operacional ya validado.
+## C3.2 — Voucher operacional
 
-### C3.3 Offline-first
+El núcleo online ya está integrado en R3. Pendientes: PDF/reemisión detallada y scanner de cámara.
+
+## C3.3 — Offline-first
+
 - PWA;
 - IndexedDB;
 - outbox/idempotencia;
 - manifiesto/voucher cache;
-- QR firmado y reconciliación de redenciones.
+- QR firmado y reconciliación offline.
 
-### C3.4 Operación y reporting
-- manifiestos;
+## C3.4 — Operación y reporting
+
+- creación completa de salidas;
+- manifiestos/check-in;
 - export CSV/PDF;
-- liquidaciones/reportes básicos;
-- notificaciones email/WhatsApp API.
-
-**Éxito:** journeys E2E de reserva→voucher→redención y offline scan pasan; producción readiness 100%.
+- liquidaciones/reportes;
+- notificaciones mediante APIs autorizadas.
 
 ## Regla de priorización
 
-No iniciar una feature C3 que dependa de un P0 sin cerrar. Una pantalla nueva no compensa un build rojo, fuga RLS o inventario no confiable. Todo frente nuevo debe partir desde `dev`, trabajar en rama propia, ejecutar pruebas locales y abrir PR hacia `dev`; nunca debe escribirse directamente sobre `dev` o `main`.
+Todo frente nuevo parte de `dev`, trabaja en rama propia, ejecuta pruebas y abre PR hacia `dev`. Nunca trabajar directamente sobre `dev` o `main`, ni abrir `feature/*`/`fix/*` hacia `main`. Una promoción a `main` solo ocurre mediante PR `dev → main` al cerrar un hito verificable.

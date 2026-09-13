@@ -2,33 +2,42 @@
 
 ## Ramas
 
-- `main`: estado promovido para producción/release; nunca integración diaria.
-- `dev`: integración continua y origen de nuevas ramas.
+- `main`: promoción de producción/release; nunca integración diaria.
+- `dev`: rama de integración y base de nuevas ramas; no es rama de trabajo directo.
 - `feature/<descripcion-corta>`: funcionalidad.
-- `fix/<descripcion-corta>`: bug/corrección.
-- `docs/<descripcion-corta>` puede usarse solo para cambios exclusivamente documentales.
+- `fix/<descripcion-corta>`: corrección.
+- `docs/<descripcion-corta>`: cambios exclusivamente documentales.
 
-## Flujo
+## Flujo obligatorio
 
 ```text
-dev
- └─ feature/x o fix/x
-       └─ PR → dev: CI + ≥1 review
+dev actualizado
+ └─ feature/x | fix/x | docs/x
+       └─ PR → dev: CI + review
                     ↓
                   dev
-                    └─ PR de fase → main: CI + CODEOWNER @LavenderEdit
+                    └─ PR de fase → main
 ```
+
+Prohibido:
+
+- push/merge directo a `dev`;
+- push/merge directo a `main`;
+- PR `feature/*`, `fix/*`, `docs/*` o `chore/*` hacia `main`;
+- usar `main` como rama de reparación o respaldo de trabajo inconcluso.
 
 ## Commits
 
-Preferir Conventional Commits: `fix(auth): ...`, `feat(voucher): ...`, `docs(architecture): ...`, `refactor(booking): ...`, `chore(ci): ...`.
+Preferir Conventional Commits y agrupar cambios coherentes. Evitar un commit por ajuste mínimo cuando eso dispare CI innecesario. Desarrollar/probar primero y subir lotes lógicos.
 
 ## Pull Requests
 
-Todo PR usa `.github/PULL_REQUEST_TEMPLATE.md`. Cambios de código que afecten comportamiento requieren docs. Agentes incluyen Context Token.
+Todo PR usa plantilla. Cambios de comportamiento requieren docs/tests. Agentes incluyen Context Token. CI rojo bloquea merge.
 
 ## Promoción `dev → main`
 
-Solo al cerrar un hito/fase. El PR debe contener resumen ejecutivo, issues cerrados, evidencia CI, riesgos residuales, rollback y confirmación de documentación actualizada.
+Solo al cerrar un hito. Debe incluir resumen, evidencia de gates, riesgos residuales, rollback y confirmación documental.
 
-No usar `main` como rama de respaldo de trabajo inconcluso.
+## Enforcement actual
+
+La política anterior es obligatoria aunque GitHub todavía no tenga Branch Protection activa sobre `dev`. `main` sí está protegido; `dev` debe recibir su ruleset según `docs/ci-config/BRANCH_PROTECTION.md`.

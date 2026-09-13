@@ -5,19 +5,20 @@
 <!-- REACT_VERSION:19.2.4 -->
 <!-- PROJECT_STATUS:UNSTABLE -->
 
-Plataforma B2B para gestionar disponibilidad, reservas y vouchers digitales de servicios turísticos en las Islas Galápagos. El objetivo del producto es conectar agencias de viaje, operadores turísticos y personal operativo con un flujo simple de inventario → reserva → voucher → validación/redención.
+Plataforma B2B para gestionar disponibilidad, reservas y vouchers digitales de servicios turísticos en las Islas Galápagos. El núcleo del producto es inventario → hold/reserva → pago/confirmación → voucher → redención.
 
-> **Estado actual:** `dev` ya incorporó **S0, R1, R2 y R3**. La integración valida Auth/RLS/RPC/PostgREST, y los gates críticos validan en Chromium el flujo login agency → búsqueda → reserva → voucher → operador → redención única. `main` todavía NO se considera producción estable porque faltan pagos/conciliación, deploy/rollback probado y otras capacidades P1. El siguiente frente recomendado es **O2/C3 — endurecimiento productivo y operación**. El estado autoritativo está en [BASELINE.md](./BASELINE.md).
+> **Estado actual de `dev`:** S0, R1, R2, R3 y el slice O2/C3.1 de holds e idempotencia están integrados. El último gate Supabase validó **38/38** pruebas reales de Auth/RLS/RPC/PostgREST, incluyendo concurrencia de último cupo, redención y holds. `main` continúa **UNSTABLE / NO PRODUCCIÓN** porque faltan pagos/conciliación, operación completa, observabilidad y deploy/rollback probado. El siguiente frente es **C3.1 — Payments & Booking Lifecycle**. Consulta [CURRENT_WORK.md](./docs/roadmap/CURRENT_WORK.md) y [BASELINE.md](./BASELINE.md).
 
 ## Lectura obligatoria antes de modificar código
 
-1. [INDEX.md](./INDEX.md) — mapa completo del sistema documental.
-2. [BASELINE.md](./BASELINE.md) — estado real, deuda y riesgos conocidos.
+1. [BASELINE.md](./BASELINE.md) — estado real y deuda vigente.
+2. [CURRENT_WORK.md](./docs/roadmap/CURRENT_WORK.md) — siguiente frente exacto y Definition of Done.
 3. [AI_CONTEXT.md](./AI_CONTEXT.md) — reglas técnicas obligatorias.
 4. [AGENT_PROTOCOL.md](./AGENT_PROTOCOL.md) — protocolo para agentes de IA.
-5. [Roadmap](./docs/roadmap/ROADMAP.md) — orden de rescate y evolución.
+5. [INDEX.md](./INDEX.md) — mapa documental completo.
+6. [Roadmap](./docs/roadmap/ROADMAP.md) — secuencia de evolución.
 
-Una persona nueva debe poder completar la guía [Onboarding en 15 minutos](./docs/guides/ONBOARDING_15_MIN.md) antes de realizar cambios.
+Una persona nueva debe completar la guía [Onboarding en 15 minutos](./docs/guides/ONBOARDING_15_MIN.md) antes de realizar cambios.
 
 ## Arquitectura de alto nivel
 
@@ -25,9 +26,9 @@ Una persona nueva debe poder completar la guía [Onboarding en 15 minutos](./doc
 flowchart LR
   A[Admin Web] --> N[Next.js App Router]
   B[Agency Web] --> N
-  C[Operator / Scanner PWA futuro] --> N
+  C[Operator Web] --> N
   N --> AUTH[Supabase Auth + RLS]
-  N --> RPC[PostgreSQL RPC / Booking Engine]
+  N --> RPC[PostgreSQL RPC]
   RPC --> DB[(PostgreSQL)]
   N --> VERIFY[Public Voucher Verification]
   OFF[IndexedDB + Outbox futuro] -. sync .-> N
@@ -41,7 +42,7 @@ Detalles: [docs/architecture/system-overview.md](./docs/architecture/system-over
 - React 19.2.4 + TypeScript 5 en modo `strict`.
 - Tailwind CSS 4.
 - Supabase SSR / Supabase JS.
-- PostgreSQL + RLS + funciones RPC mediante migraciones Supabase.
+- PostgreSQL + RLS + funciones RPC mediante migraciones Supabase append-only.
 - GitHub Actions para gates de documentación, producción, integración Supabase y E2E crítico.
 - Playwright fijado en CI para el gate de navegador, sin incorporarlo todavía al lockfile principal.
 
@@ -52,9 +53,9 @@ Detalles: [docs/architecture/system-overview.md](./docs/architecture/system-over
 | Login | `/` | Funcional; redirect y `next` protegidos por rol |
 | Admin | `/admin` | Parcial; altas reales de agencias/tours/embarcaciones |
 | Agencias | `/agency` | Búsqueda server-side, contexto de agencia, comisión y reserva reales |
-| Reservas agencia | `/agency/reservations` | Funcional parcial |
-| Operador | `/operator` | Parcial; ownership de flota validado en runtime |
-| Cupos | `/operator/availability` | Funcional parcial; mutación por RPC con ownership |
+| Reservas agencia | `/agency/reservations` | Historial/cancelación reales; holds disponibles en backend |
+| Operador | `/operator` | Ownership de flota validado; operación todavía parcial |
+| Cupos | `/operator/availability` | Mutación por RPC con ownership |
 | Redención operador | `/operator/redeem` | Verificación y redención online mediante RPC atómico |
 | Voucher público | `/verify/[token]` | Validación online, QR y estado de redención |
 
@@ -63,66 +64,65 @@ Detalles: [docs/architecture/system-overview.md](./docs/architecture/system-over
 ```bash
 npm ci
 cp .env.example .env.local
-# Configura NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY
+# Configura las variables públicas de Supabase
 supabase start
 supabase db reset
 npm run dev
 ```
 
-El lockfile está sincronizado y `npm ci` es la instalación autoritativa. No usar `npm install` para ocultar drift entre `package.json` y `package-lock.json`.
+El lockfile está sincronizado y `npm ci` es la instalación autoritativa. Un fallo de `npm ci` es un bloqueo nuevo, no una deuda aceptada.
 
 ## Comandos de calidad
 
 ```bash
-npm run lint
-npm run typecheck
-npm test
 npm run docs:validate
 npm run docs:health
 npm run changelog:validate
+npm run lint
+npm run typecheck
+npm test
 npm run build
 ```
 
-Para pruebas RLS/RPC reales, con un Supabase local levantado y las credenciales locales exportadas:
+Para pruebas RLS/RPC reales, con Supabase local levantado y variables locales de prueba:
 
 ```bash
 npm run test:integration
 ```
 
-El workflow `Supabase Integration` automatiza el stack efímero, `db reset`, usuarios/fixtures y **18 pruebas de integración** en PRs relevantes contra `dev`/`main`; no usa secretos del proyecto remoto.
+El baseline actual es **38/38** pruebas de integración. `Critical E2E` valida en Chromium el flujo agency → búsqueda → reserva → voucher y el flujo operator → redención → bloqueo del segundo uso. La guía completa está en [docs/guides/TESTING.md](./docs/guides/TESTING.md).
 
-El workflow `Critical E2E` levanta un Supabase local mínimo y ejecuta Chromium contra la aplicación real. El flujo integrado verifica login de agencia, búsqueda, reserva de dos pasajeros, cálculo de comisión, voucher público, login de operador, redención y bloqueo del segundo uso. La guía completa de ejecución local está en [docs/guides/TESTING.md](./docs/guides/TESTING.md). R3 añade integración PostgreSQL para redención, anti doble uso, concurrencia y autorización.
-
-Los workflows de PR usan cancelación de ejecuciones obsoletas donde aplica para evitar consumir minutos en revisiones reemplazadas por un commit más reciente. CI debe ser verde antes de mergear a `dev`. `main` requiere además revisión y gate de producción.
-
-## Flujo Git
+## Flujo Git obligatorio
 
 ```text
-feature/* o fix/*
-      ↓ PR + CI + review
+dev actualizado
+  ↓ crear feature/*, fix/* o docs/*
+rama de trabajo
+  ↓ pruebas + PR + CI + review
 dev
-      ↓ PR de fase + revisión explícita
-main
+  ↓ solo al cerrar un hito
+PR dev → main
 ```
 
-Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
+**No hacer push ni merge directo a `dev` o `main`.** Aunque GitHub todavía no aplique todas las reglas de protección en `dev`, la política del proyecto sigue siendo obligatoria. Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
 
 ## Principios no negociables
 
 - No bypass de RLS para resolver problemas de permisos.
-- No lógica crítica de inventario en el cliente.
-- No cambios directos a `main` ni a `dev`; trabajar mediante rama y PR.
+- No lógica crítica de inventario, pagos o redención en el cliente.
 - No mocks presentados como funcionalidad productiva.
-- No merge con build rojo.
+- No merge con CI rojo.
 - No cambio de contratos, roles, tablas o comportamiento público sin documentación asociada.
-- Reservas productivas deben pasar por el motor RPC transaccional, no por inserts directos.
+- No confundir total reservado con dinero cobrado.
+- Reservas productivas deben pasar por RPC transaccional.
 - Cambios de permisos requieren pruebas positivas y negativas contra Supabase real.
-- No automatización productiva de WhatsApp Web; usar APIs autorizadas.
 
 ## Próximo frente
 
-**R3 — Voucher operacional / redención** está integrado en `dev`: QR, redención autoritativa, anti doble uso, auditoría, UI operacional y cobertura de integración/E2E.
+**C3.1 — Payments & Booking Lifecycle**.
+
+Objetivo inmediato: crear un ledger de pagos separado de `reservations.total_price`, definir estados e idempotencia de pago/conciliación y preparar el flujo autoritativo `hold → pago aprobado → confirmación → voucher`, sin fingir cobros desde UI. No integrar un proveedor externo hasta que exista una decisión explícita de proveedor/contrato. Alcance y DoD: [CURRENT_WORK.md](./docs/roadmap/CURRENT_WORK.md).
 
 ## Estado de producción
 
-Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). S0, R1, R2 y R3 están integrados en `dev`, pero hasta que existan pagos/conciliación, controles operativos y despliegue/rollback probado, este repositorio debe tratarse como **producto en estabilización**.
+Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). `dev` está estabilizado y probado, pero `main` todavía no debe tratarse como release productivo.

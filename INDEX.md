@@ -1,29 +1,30 @@
 # Índice maestro de documentación
 
-Este archivo es el punto de entrada del sistema documental. Orden recomendado de lectura: 10–15 minutos para contexto mínimo, luego documentación específica de la tarea.
+Punto de entrada del sistema documental. La ruta rápida debe dar contexto suficiente en 10–15 minutos.
 
-## Ruta rápida — 15 minutos
+## Ruta rápida
 
-1. `README.md` — 2 min: propósito, stack y estado.
-2. `BASELINE.md` — 4 min: qué está roto y qué sí funciona.
-3. `AI_CONTEXT.md` — 4 min: reglas obligatorias y anti-patrones.
-4. `docs/roadmap/ROADMAP.md` — 3 min: qué se arregla primero.
-5. `docs/guides/GIT_WORKFLOW.md` — 2 min: cómo contribuir.
+1. `README.md` — propósito y estado.
+2. `BASELINE.md` — estado verificable y deuda.
+3. `docs/roadmap/CURRENT_WORK.md` — siguiente frente exacto.
+4. `AI_CONTEXT.md` — reglas técnicas.
+5. `docs/guides/GIT_WORKFLOW.md` — cómo contribuir.
+6. documento del módulo afectado.
 
 ## Fundacional
 
-- [README.md](./README.md) — puerta de entrada.
-- [BASELINE.md](./BASELINE.md) — snapshot técnico verificable.
-- [AI_CONTEXT.md](./AI_CONTEXT.md) — contrato de arquitectura/código.
-- [AGENT_PROTOCOL.md](./AGENT_PROTOCOL.md) — reglas para agentes de IA.
-- [CHANGELOG.md](./CHANGELOG.md) — cambios versionados.
+- [README.md](./README.md)
+- [BASELINE.md](./BASELINE.md)
+- [AI_CONTEXT.md](./AI_CONTEXT.md)
+- [AGENT_PROTOCOL.md](./AGENT_PROTOCOL.md)
+- [CHANGELOG.md](./CHANGELOG.md)
 
 ## Arquitectura
 
 - [Visión general](./docs/architecture/system-overview.md)
-- [Mapa de módulos y dependencias](./docs/architecture/module-map.md)
+- [Mapa de módulos](./docs/architecture/module-map.md)
 - [Contratos RPC/API](./docs/architecture/api-contracts.md)
-- [Arquitectura offline-first](./docs/architecture/offline-first.md)
+- [Offline-first](./docs/architecture/offline-first.md)
 - [Admin](./docs/architecture/modules/admin.md)
 - [Agency](./docs/architecture/modules/agency.md)
 - [Operator](./docs/architecture/modules/operator.md)
@@ -34,8 +35,9 @@ Este archivo es el punto de entrada del sistema documental. Orden recomendado de
 
 ## Roadmap
 
-- [Roadmap por fases](./docs/roadmap/ROADMAP.md)
-- [Hitos y Gantt simplificado](./docs/roadmap/MILESTONES.md)
+- [Trabajo actual](./docs/roadmap/CURRENT_WORK.md) — fuente autoritativa del siguiente frente.
+- [Roadmap](./docs/roadmap/ROADMAP.md)
+- [Hitos](./docs/roadmap/MILESTONES.md)
 
 ## Guías
 
@@ -49,25 +51,24 @@ Este archivo es el punto de entrada del sistema documental. Orden recomendado de
 
 ## CI y gobierno
 
-- [Auto-evaluación docs↔código](./docs/ci-config/AUTO_EVALUATION.md)
+- [Auto-evaluación](./docs/ci-config/AUTO_EVALUATION.md)
 - [Salud documental](./docs/ci-config/DOCUMENT_HEALTH.md)
 - [Protección de ramas](./docs/ci-config/BRANCH_PROTECTION.md)
 
-## Plantillas
+## Plantillas y sesiones
 
 - [Pull Request](./templates/PULL_REQUEST_TEMPLATE.md)
-- [Registro de sesión de agente](./templates/AGENT_SESSION_LOG.md)
+- [Registro de sesión](./templates/AGENT_SESSION_LOG.md)
 - [Sesiones de agentes](./docs/agent-sessions/README.md)
 
 ## Orden de autoridad
 
-Si dos documentos entran en conflicto, prevalece este orden:
-
 1. Código + migraciones ejecutables en la rama objetivo.
 2. `BASELINE.md` para estado actual.
-3. `AI_CONTEXT.md` para convenciones obligatorias.
-4. Documentos de arquitectura.
-5. Roadmap.
-6. README/guías.
+3. `docs/roadmap/CURRENT_WORK.md` para el siguiente frente.
+4. `AI_CONTEXT.md` para convenciones.
+5. Documentos de arquitectura.
+6. Roadmap general.
+7. README/guías.
 
 Una contradicción entre documentación y código es un defecto que debe corregirse en el mismo PR.
