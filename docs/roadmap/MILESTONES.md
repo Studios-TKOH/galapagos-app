@@ -1,23 +1,22 @@
-# Hitos y Gantt simplificado
+# Hitos y estado
 
-Escenario de referencia: un desarrollador principal, seis semanas. Ajustar por capacidad real.
+## Estado actual
 
-| Semana | S0 Estabilización | R1 Refactor | O2 Optimización | C3 Completitud |
-|---|---|---|---|---|
-| 1 | █████ |  |  |  |
-| 2 | ██ cierre | ███ |  |  |
-| 3 |  | ███ cierre | ██ |  |
-| 4 |  |  | ███ cierre | ██ Core |
-| 5 |  |  |  | █████ Voucher/Offline |
-| 6 |  |  |  | █████ Reportes/Prod gate |
+| Gate | Estado | Evidencia / deuda |
+|---|---|---|
+| M0 — estabilización | **completado** | build, lockfile, auth/RLS y CI estabilizados |
+| M1 — seguridad/funcionalidad | **completado** | R1 + R2, integración real y E2E comercial |
+| M2 — idempotencia/optimización | **parcial** | holds/idempotencia/último cupo integrados; falta observabilidad/performance |
+| M3 — MVP operacional online | **parcial** | voucher/redención online integrados; faltan pagos y manifiestos |
+| M4 — offline-first | pendiente | modo avión, outbox, dos dispositivos |
+| M5 — production readiness | pendiente | backup/restore, deploy/rollback, observabilidad y gates finales |
 
-## Gates
+## Secuencia recomendada
 
-- **M0:** CI reproducible verde y seguridad P0 cerrada.
-- **M1:** deuda estructural principal bajo control y tests de dominio.
-- **M2:** performance/observabilidad/idempotencia medidos.
-- **M3:** MVP operacional end-to-end.
-- **M4:** offline-first validado en modo avión/2 dispositivos.
-- **M5:** production readiness aprobado.
+1. **C3.1 Payments & Booking Lifecycle**.
+2. Operación de salidas, pasajeros y manifiestos.
+3. Observabilidad, rendimiento, backup/restore y deploy/rollback.
+4. Offline-first.
+5. Production readiness y PR `dev → main`.
 
-Cada gate termina con PR `dev → main`; no se promociona una fase porque “ya se trabajó”, sino porque cumple DoD medible.
+Cada gate termina con evidencia medible. No se promociona a `main` porque una fase “ya se trabajó”.

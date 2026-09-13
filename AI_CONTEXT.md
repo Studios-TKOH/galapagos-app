@@ -1,113 +1,103 @@
 # AI_CONTEXT — Contrato técnico del proyecto
 
-Este documento es obligatorio para cualquier agente de IA y recomendado para toda persona que modifique el repositorio. Su propósito es evitar cambios plausibles pero incompatibles con la arquitectura real.
+Este documento es obligatorio para cualquier agente de IA y recomendado para toda persona que modifique el repositorio.
 
 ## 1. Objetivo del producto
 
-Sistema B2B de vouchers digitales para turismo en Galápagos. El núcleo de negocio es **inventario → hold/reserva → confirmación/pago → voucher → redención**, con evolución offline-first para operación en conectividad intermitente.
+Sistema B2B de vouchers digitales para turismo en Galápagos. Núcleo: **inventario → hold/reserva → pago/confirmación → voucher → redención**, con evolución offline-first.
 
 ## 2. Stack autorizado
 
 - Next.js App Router + React + TypeScript estricto.
-- Tailwind CSS para estilos existentes.
+- Tailwind CSS.
 - Supabase Auth/SSR, PostgreSQL y RLS.
-- Funciones PostgreSQL/RPC para operaciones transaccionales críticas.
+- RPC PostgreSQL para operaciones transaccionales críticas.
 - GitHub Actions para gates.
 
-No introducir otro framework de frontend, ORM, base de datos o sistema de auth sin ADR/decisión explícita y migración aprobada.
+No introducir otro framework, ORM, base de datos o sistema de auth sin decisión explícita y plan de migración.
 
-## 3. Capas y responsabilidades
+## 3. Capas y autoridad
 
 ```text
-src/app/              rutas y composición de páginas
-src/components/       UI reutilizable por dominio
+src/app/              rutas y composición
+src/components/       UI por dominio
 src/lib/auth/         autorización server-side
-src/lib/supabase/     clientes Supabase y session proxy
-supabase/migrations/  schema, RLS, RPC y evolución de datos
-scripts/              validaciones del repositorio
-/docs                  documentación autoritativa
+src/lib/supabase/     clientes y sesión
+supabase/migrations/  schema, RLS y RPC
+scripts/              validaciones
+/docs                  documentación
 ```
 
-### Regla crítica
+La lógica que modifica cupos, reservas, pagos o redenciones debe ser atómica y autoritativa en servidor/PostgreSQL.
 
-La lógica que modifica cupos, reservas, pagos o redenciones debe ser atómica y autoritativa en servidor/PostgreSQL. El cliente nunca decide disponibilidad final.
+## 4. TypeScript
 
-## 4. Convenciones TypeScript
+- mantener `strict: true`;
+- no ocultar incompatibilidades con casts inseguros;
+- preferir tipos generados cuando estén disponibles;
+- modelar errores esperables;
+- mover gradualmente acceso a datos fuera de JSX cuando se toque funcionalidad.
 
-- `strict: true` se respeta; no silenciar con `any` salvo frontera externa justificada.
-- Prohibido usar `as unknown as X` para ocultar incompatibilidades estructurales sin issue de seguimiento.
-- Preferir tipos generados desde Supabase cuando estén disponibles.
-- Toda función async debe modelar estados de error esperables.
-- No usar `!` sobre variables de entorno fuera de un validador central.
-- Hooks complejos y acceso a datos deben migrar gradualmente fuera de JSX hacia módulos de dominio/queries.
+## 5. Nomenclatura
 
-## 5. Convenciones de nomenclatura
+| Elemento | Convención |
+|---|---|
+| Componentes | PascalCase |
+| Funciones/variables | camelCase |
+| RPC/tablas | snake_case |
+| Ramas feature | `feature/<descripcion>` |
+| Ramas fix | `fix/<descripcion>` |
+| Ramas docs | `docs/<descripcion>` |
 
-| Elemento | Convención | Ejemplo |
-|---|---|---|
-| Componentes React | PascalCase | `BookingModal.tsx` |
-| Funciones/variables | camelCase | `createReservation` |
-| RPC PostgreSQL | snake_case | `create_reservation` |
-| Tablas | plural snake_case | `voucher_redemptions` |
-| Ramas fix | `fix/<descripcion-corta>` | `fix/auth-role-redirect` |
-| Ramas feature | `feature/<descripcion-corta>` | `feature/voucher-redemption` |
-| Docs | UPPER_SNAKE para raíz; kebab-case en `/docs` | `BASELINE.md`, `offline-first.md` |
-
-## 6. Estados de negocio recomendados
-
-No inventar estados ad hoc desde UI. La dirección objetivo es:
+## 6. Estados de negocio objetivo
 
 ```text
 booking: DRAFT → HELD → PENDING_PAYMENT → CONFIRMED → COMPLETED
                                       ↘ CANCELLED
 voucher: ISSUED → REDEEMED
             ↘ REVOKED / EXPIRED
+payment: estado propio; no inferir desde reservation.status
 ```
 
-Hasta que el schema migre, documentar cualquier diferencia explícitamente.
+## 7. Seguridad
 
-## 7. Seguridad obligatoria
-
-- Toda tabla expuesta por Supabase Data API debe tener RLS o `GRANT` explícitamente justificado.
-- Acceso operador/agencia debe filtrar por organización/recurso, no solo por nombre de rol.
-- Secretos nunca usan prefijo `NEXT_PUBLIC_`.
-- QR offline futuro usa firma asimétrica; la clave privada jamás llega al cliente.
-- Signup B2B público no puede asignar rol operativo sin aprobación/invitación.
-- PII mínima en QR, logs y caches offline.
+- toda tabla expuesta debe tener RLS o grant justificado;
+- scope de operator/agency se valida por organización/recurso;
+- signup B2B público no asigna rol operativo;
+- cambios de seguridad/dinero requieren integración real;
+- offline futuro contiene datos mínimos y evita una segunda fuente de verdad.
 
 ## 8. UI/UX
 
-- Preservar patrones actuales salvo decisión global.
-- Mobile-first para operador/scanner.
-- Estados loading/error/empty/disabled son obligatorios.
-- No presentar botones sin implementación como funcionalidad terminada. Si aún no funciona: ocultar, deshabilitar con explicación o implementar.
-- Mantener accesibilidad: labels, foco visible, controles nativos y targets táctiles suficientes.
+- preservar patrones actuales salvo decisión global;
+- mobile-first para operator/scanner;
+- loading/error/empty/disabled obligatorios;
+- no presentar controles no implementados como funcionalidad real;
+- accesibilidad básica obligatoria.
 
-## 9. Documentación obligatoria por cambio
+## 9. Documentación por cambio
 
-- Cambio de firma RPC/schema/RLS → `docs/architecture/api-contracts.md`, `modules/data-layer.md`, `BASELINE.md` cuando cambie estado.
-- Cambio de módulo/componente público → doc de módulo correspondiente.
-- Cambio de arquitectura/imports entre áreas → `module-map.md`.
-- Cambio de versión → `CHANGELOG.md`.
-- Cambio de flujo operativo → README/guía correspondiente si afecta onboarding.
-
-CI valida parte de estas relaciones automáticamente.
+- firma RPC/schema/RLS → `api-contracts.md`, `data-layer.md` y baseline cuando cambie estado;
+- módulo/componente público → doc del módulo;
+- arquitectura/import cross-module → `module-map.md`;
+- cambio relevante/versionado → `CHANGELOG.md`;
+- flujo operativo/onboarding → README/guía correspondiente.
 
 ## 10. Anti-patrones prohibidos
 
-1. `npm install` en CI para ocultar lockfile roto.
-2. Desactivar TypeScript strict o ESLint para hacer pasar build.
-3. `service_role` en navegador.
-4. Desactivar RLS como solución temporal.
-5. Mutar cupos con `.update()` cliente evitando RPC de concurrencia.
-6. Hardcodear comisión, precios o permisos en componentes.
-7. Confundir `reservation total` con `payment collected`.
-8. Usar WhatsApp Web automatizado como integración productiva.
-9. Introducir mocks con copy de “datos reales”.
-10. Merge directo a `main`.
-11. Reescribir el stack completo sin ADR y plan de migración.
-12. Romper tests existentes sin explicar causa, reemplazo y riesgo.
+1. ocultar lockfile roto con instalación no reproducible;
+2. desactivar strict/lint;
+3. credenciales privilegiadas en navegador;
+4. desactivar RLS como solución temporal;
+5. mutar cupos evitando RPC;
+6. hardcodear comisión/precio/permisos cuando existe fuente de verdad;
+7. confundir total reservado con dinero cobrado;
+8. mocks presentados como funcionalidad productiva;
+9. push o merge directo a `dev` o `main`;
+10. abrir `feature/*`, `fix/*` o `docs/*` directamente hacia `main`;
+11. reescribir stack sin decisión y migración;
+12. romper tests existentes sin explicación/reemplazo.
 
 ## 11. Antes de editar
 
-Leer en este orden: `README.md` → `BASELINE.md` → este archivo → doc del módulo → `AGENT_PROTOCOL.md` si eres agente. Después inspeccionar el código real. La documentación orienta; el código confirma.
+Leer: `README.md` → `BASELINE.md` → `docs/roadmap/CURRENT_WORK.md` → este archivo → doc del módulo → `AGENT_PROTOCOL.md` si eres agente. Después inspeccionar código/migraciones reales.

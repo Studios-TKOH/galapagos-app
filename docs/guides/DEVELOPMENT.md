@@ -2,14 +2,14 @@
 
 ## Requisitos
 
-Node 22, npm compatible con lockfile, Supabase CLI y Docker para entorno local.
+Node 22, npm compatible con el lockfile, Supabase CLI y Docker para entorno local.
 
 ## Setup
 
 ```bash
-git checkout dev
-git pull
-git checkout -b fix/descripcion-corta
+git switch dev
+git pull origin dev
+git switch -c feature/descripcion-corta
 npm ci
 cp .env.example .env.local
 supabase start
@@ -17,7 +17,7 @@ supabase db reset
 npm run dev
 ```
 
-En baseline `npm ci` está esperado a fallar hasta reparar el lockfile P0. No sustituir permanentemente por `npm install`.
+`npm ci` debe pasar sobre `dev`. Si falla, tratarlo como un bloqueo real y no sustituirlo permanentemente por `npm install`.
 
 ## Antes de commit
 
@@ -27,9 +27,19 @@ npm run docs:health
 npm run changelog:validate
 npm run lint
 npm run typecheck
-npm run test --if-present
+npm test
 npm run build
 ```
+
+Si el cambio toca RLS, RPC, schema, pagos, inventario o seguridad, ejecutar también `npm run test:integration`. Si cambia un journey crítico de UI, actualizar/ejecutar el E2E correspondiente.
+
+## Git
+
+- `dev` es la base de nuevas ramas, no una rama de trabajo directo.
+- usar `feature/*`, `fix/*` o `docs/*` según el cambio;
+- abrir PR hacia `dev`;
+- solo una promoción de fase/hito usa PR `dev → main`;
+- nunca push/merge directo a `dev` o `main`.
 
 ## Migraciones
 
@@ -40,4 +50,4 @@ npm run build
 
 ## Variables de entorno
 
-Solo valores que pueden exponerse al navegador usan `NEXT_PUBLIC_`. Secretos de pagos, WhatsApp, firma QR o service role son server-only.
+Solo valores explícitamente públicos usan `NEXT_PUBLIC_`. Secretos de pagos, mensajería, firma QR o credenciales privilegiadas son server-only.

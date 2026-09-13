@@ -15,47 +15,45 @@ Los marcadores `API_CONTRACT` se comparan automáticamente contra funciones con 
 
 ## `current_user_role()`
 
-Helper de autorización. Devuelve el nombre del rol del usuario autenticado. No debe utilizarse como sustituto de aislamiento por organización.
+Helper de autorización. Devuelve el nombre del rol autenticado; no reemplaza aislamiento por organización/recurso.
 
 ## `verify_voucher(TEXT)`
 
-Valida token de voucher y devuelve información pública operacional. Actualmente requiere backend online para consultar PostgreSQL. El diseño offline futuro debe usar QR firmado sin PII innecesaria.
+Valida un token y devuelve información pública operacional. Es lectura/verificación, no redención.
 
 ## `search_availability(DATE, TEXT, INT)`
 
-Busca salidas activas filtrando fecha, texto de ruta/origen/destino y capacidad mínima antes de aplicar `LIMIT 50`. Es `SECURITY INVOKER`, por lo que las policies RLS de disponibilidad, embarcaciones, rutas y tours siguen aplicándose al caller. Devuelve un resultado plano listo para la UI de agencia.
+Filtra fecha, ruta/origen/destino y capacidad mínima antes de `LIMIT 50`. Es `SECURITY INVOKER`, por lo que conserva RLS del caller.
 
 ## `create_reservation(UUID, UUID, INT, TEXT, TEXT)`
 
-Crea una reserva confirmada de forma atómica, bloquea la fila de disponibilidad, valida cupos, calcula importe/comisión, reduce inventario, crea voucher y audit log.
+Flujo confirmado existente usado por la UI agency. Bloquea disponibilidad, valida cupos/agencia, calcula importe/comisión, reduce inventario y crea voucher/auditoría de forma atómica.
 
-La comisión se obtiene de `agencies.commission_rate`; la tasa por defecto actual es 15%, pero puede configurarse por agencia sin cambiar el código cliente ni la firma del RPC. El precio continúa dependiendo del tour y todavía no existe hold/pago previo.
-
-La tabla `reservations` no admite `INSERT` directo para usuarios autenticados: la creación debe pasar por este RPC para preservar lock de cupos, validación de agencia y auditoría.
-
-## `cancel_reservation(UUID)`
-
-Cancela y devuelve cupos. Valida ownership de agencia/operador dentro del propio RPC porque es `SECURITY DEFINER`.
-
-## `update_availability_seats(UUID, INT)`
-
-Ajusta cupos disponibles validando reservas existentes. Operadores solo pueden modificar disponibilidad de embarcaciones cuyo `owner_id` coincide con el usuario autenticado; admin conserva alcance global.
-
-## `assign_user_role(UUID, TEXT)`
-
-Aprovisiona explícitamente `admin`, `agency` u `operator` para un perfil existente. Solo un usuario con rol `admin` puede ejecutarlo. El cambio genera `audit_logs`; un usuario no puede modificar su propio `role_id` para elevar privilegios.
-
-## `redeem_voucher(TEXT)`
-
-Redime un voucher emitido de forma atómica para un usuario autenticado con rol `admin` u `operator`. Bloquea la fila del voucher, rechaza vouchers inexistentes, cancelados, revocados, expirados o ya redimidos, y exige que un operador sea propietario de la embarcación de la salida. Persiste el estado `redeemed`, una fila append-only en `voucher_redemptions` y un evento `audit_logs`; la redención no puede realizarse mediante mutaciones directas del cliente.
+O2 no elimina este RPC: añade un lifecycle separado de hold/confirmación. El siguiente frente debe migrar progresivamente el journey hacia `hold → payment state → confirm` sin inferir dinero cobrado desde la reserva.
 
 ## `create_reservation_hold(UUID, UUID, INT, TEXT, TEXT, TEXT, INT)`
 
-Crea un hold de inventario con estado `held`, expiración y clave idempotente por usuario. Bloquea la disponibilidad en PostgreSQL, libera holds vencidos de esa salida antes de comprobar cupos y rechaza la reutilización de una clave con un payload diferente. No emite voucher ni representa un pago.
+Crea un hold `held` con expiración y clave idempotente por usuario. Bloquea disponibilidad, libera holds vencidos de la salida y rechaza la misma clave con payload distinto. No emite voucher ni representa pago.
 
 ## `confirm_reservation_hold(UUID)`
 
-Confirma un hold no vencido perteneciente a la agencia solicitante o a un admin y emite el voucher dentro de la misma transacción. Un hold expirado libera sus cupos y no puede confirmarse.
+Confirma un hold vigente y autorizado y emite un único voucher en la misma transacción. Un hold vencido no puede confirmarse. El frente de pagos debe endurecer la transición financiera alrededor de este contrato sin mover autoridad al cliente.
+
+## `cancel_reservation(UUID)`
+
+Cancela y devuelve cupos validando ownership dentro del RPC.
+
+## `update_availability_seats(UUID, INT)`
+
+Ajusta cupos; operadores solo modifican disponibilidad de su propia flota y admin conserva alcance global.
+
+## `assign_user_role(UUID, TEXT)`
+
+Aprovisiona roles operativos para un perfil existente. Solo admin; el cambio se audita.
+
+## `redeem_voucher(TEXT)`
+
+Redime de forma atómica para admin/operator autorizado, valida ownership, bloquea la fila, rechaza estados inválidos o doble uso y persiste redención + auditoría.
 
 ## Cambio de contrato
 
