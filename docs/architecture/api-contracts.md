@@ -10,6 +10,8 @@ Los marcadores `API_CONTRACT` se comparan automáticamente contra funciones con 
 <!-- API_CONTRACT update_availability_seats(UUID,INT) -->
 <!-- API_CONTRACT assign_user_role(UUID,TEXT) -->
 <!-- API_CONTRACT redeem_voucher(TEXT) -->
+<!-- API_CONTRACT create_reservation_hold(UUID,UUID,INT,TEXT,TEXT,TEXT,INT) -->
+<!-- API_CONTRACT confirm_reservation_hold(UUID) -->
 
 ## `current_user_role()`
 
@@ -46,6 +48,14 @@ Aprovisiona explícitamente `admin`, `agency` u `operator` para un perfil existe
 ## `redeem_voucher(TEXT)`
 
 Redime un voucher emitido de forma atómica para un usuario autenticado con rol `admin` u `operator`. Bloquea la fila del voucher, rechaza vouchers inexistentes, cancelados, revocados, expirados o ya redimidos, y exige que un operador sea propietario de la embarcación de la salida. Persiste el estado `redeemed`, una fila append-only en `voucher_redemptions` y un evento `audit_logs`; la redención no puede realizarse mediante mutaciones directas del cliente.
+
+## `create_reservation_hold(UUID, UUID, INT, TEXT, TEXT, TEXT, INT)`
+
+Crea un hold de inventario con estado `held`, expiración y clave idempotente por usuario. Bloquea la disponibilidad en PostgreSQL, libera holds vencidos de esa salida antes de comprobar cupos y rechaza la reutilización de una clave con un payload diferente. No emite voucher ni representa un pago.
+
+## `confirm_reservation_hold(UUID)`
+
+Confirma un hold no vencido perteneciente a la agencia solicitante o a un admin y emite el voucher dentro de la misma transacción. Un hold expirado libera sus cupos y no puede confirmarse.
 
 ## Cambio de contrato
 
