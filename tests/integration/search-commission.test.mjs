@@ -111,10 +111,11 @@ test('server-side search filters before limit and booking uses agency commission
   });
 
   const agencyClient = await login(agencyUser);
+  const uniqueRouteQuery = `Isabela ${suffix}`;
 
   const { data: searchRows, error: searchError } = await agencyClient.rpc('search_availability', {
     p_date: null,
-    p_query: 'Puerto Villamil',
+    p_query: uniqueRouteQuery,
     p_passengers: 3,
   });
   assert.ifError(searchError);
@@ -124,7 +125,7 @@ test('server-side search filters before limit and booking uses agency commission
 
   const { data: insufficientRows, error: insufficientError } = await agencyClient.rpc('search_availability', {
     p_date: null,
-    p_query: 'Puerto Villamil',
+    p_query: uniqueRouteQuery,
     p_passengers: 5,
   });
   assert.ifError(insufficientError);
