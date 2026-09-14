@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Plus, DollarSign, Loader2, AlertCircle, Inbox, Map, ArrowRight } from "lucide-react";
 import { TourFormModal } from "@/components/admin/TourFormModal";
+import type { CreatedTour } from "@/components/admin/TourFormModal";
 import { createClient } from "@/lib/supabase/client";
 
-type Tour = { id: string; name: string; description: string | null; base_price: number | null };
+type Tour = CreatedTour;
 
 export default function ToursPage() {
   const supabase = useMemo(() => createClient(), []);
@@ -28,13 +29,18 @@ export default function ToursPage() {
     return () => { mounted = false; };
   }, [supabase]);
 
+  function handleCreated(tour: CreatedTour) {
+    setTours(current => [...current, tour].sort((a, b) => a.name.localeCompare(b.name, "es")));
+    setError("");
+  }
+
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-black uppercase tracking-widest text-primary">Catálogo</span>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Rutas y Tours</h1>
-          <p className="text-slate-500 dark:text-slate-400">Gestiona los servicios turísticos registrados.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Tours</h1>
+          <p className="text-slate-500 dark:text-slate-400">Gestiona los servicios turísticos y sus precios base.</p>
         </div>
         <button type="button" onClick={() => setIsModalOpen(true)} className="inline-flex min-h-11 items-center justify-center gap-2 px-5 py-3 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 transition-all duration-300 ease-in-out shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-950"><Plus className="w-5 h-5" />Nuevo Tour</button>
       </div>
@@ -57,14 +63,14 @@ export default function ToursPage() {
                   <span className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400"><DollarSign className="h-4 w-4 text-emerald-500" /> Precio base</span>
                   <span className="text-lg font-black text-slate-900 dark:text-white">{tour.base_price != null ? `$${Number(tour.base_price).toFixed(2)}` : "Sin precio"}</span>
                 </div>
-                <div className="mt-4 flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-xs font-medium text-slate-500 dark:bg-slate-800/70 dark:text-slate-400"><ArrowRight className="h-3.5 w-3.5 text-primary" />La disponibilidad se gestiona por salida.</div>
+                <div className="mt-4 flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-xs font-medium text-slate-500 dark:bg-slate-800/70 dark:text-slate-400"><ArrowRight className="h-3.5 w-3.5 text-primary" />Rutas y disponibilidad se gestionan por salida.</div>
               </div>
             </article>
           ))}
         </div>
       )}
 
-      <TourFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <TourFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onCreated={handleCreated} />
     </div>
   );
 }

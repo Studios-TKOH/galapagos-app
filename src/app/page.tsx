@@ -1,14 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { Ship, Mail, Key, ArrowRight, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import { resolvePostLoginPath } from "@/lib/auth/role-routing.mjs";
+
+type AppRole = "admin" | "agency" | "operator";
 
 export default function LoginPage() {
   const supabase = useMemo(() => createClient(), []);
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,13 +19,32 @@ export default function LoginPage() {
     event.preventDefault();
     setError("");
     setLoading(true);
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    if (signInError) {
+
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError || !signInData.user) {
       setError("Correo o contraseña incorrectos. Verifica tus datos e inténtalo nuevamente.");
       setLoading(false);
       return;
     }
-    window.location.assign(searchParams.get("next") || "/admin");
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("roles(name)")
+      .eq("id", signInData.user.id)
+      .maybeSingle();
+
+    const roleName = (profile?.roles as { name?: string } | null)?.name;
+    const role = roleName && ["admin", "agency", "operator"].includes(roleName) ? roleName as AppRole : null;
+
+    if (profileError || !role) {
+      await supabase.auth.signOut();
+      setError("Tu cuenta todavía no tiene un rol operativo habilitado. Contacta al administrador.");
+      setLoading(false);
+      return;
+    }
+
+    const requestedNext = new URLSearchParams(window.location.search).get("next");
+    window.location.assign(resolvePostLoginPath(role, requestedNext));
   }
 
   return (

@@ -1,79 +1,128 @@
-# 🚢 Galapagos System - Proyecto Principal
+# Galápagos Digital Voucher Platform
 
----
+<!-- PACKAGE_VERSION:0.1.0 -->
+<!-- NEXT_VERSION:16.3.4 -->
+<!-- REACT_VERSION:19.2.4 -->
+<!-- PROJECT_STATUS:UNSTABLE -->
 
-## 🎨 TAREAS PARA EL ASISTENTE DE UI (UI ASSISTANT)
-¡Hola! Si estás leyendo esto, es porque vas a ayudar a pulir la interfaz visual de este proyecto. La estructura base, los componentes pesados y la lógica de enrutamiento ya están listos. 
+Plataforma B2B para gestionar disponibilidad, reservas y vouchers digitales de servicios turísticos en las Islas Galápagos. El núcleo del producto es inventario → hold/reserva → pago/confirmación → voucher → redención.
 
-**Para no complicarte la vida, por favor enfócate ÚNICAMENTE en estas tareas:**
+> **Estado actual de `dev`:** S0, R1, R2, R3 y el slice O2/C3.1 de holds e idempotencia están integrados. El último gate Supabase validó **38/38** pruebas reales de Auth/RLS/RPC/PostgREST, incluyendo concurrencia de último cupo, redención y holds. `main` continúa **UNSTABLE / NO PRODUCCIÓN** porque faltan pagos/conciliación, operación completa, observabilidad y deploy/rollback probado. El siguiente frente es **C3.1 — Payments & Booking Lifecycle**. Consulta [CURRENT_WORK.md](./docs/roadmap/CURRENT_WORK.md) y [BASELINE.md](./BASELINE.md).
 
-1. **Cacería de Bugs Visuales (QA Visual)**:
-   - Navega por todas las pantallas simulando ser un usuario real. Si ves algún texto desalineado, un botón que se corta en móviles o algo que "se vea raro", corrígelo usando clases de Tailwind.
-2. **Mejora de Animaciones (Smooth UI)**: 
-   - Revisa las transiciones. Añade animaciones suaves en los modales, botones y tarjetas (ej. `transition-all duration-300 ease-in-out`, `hover:scale-105`, `active:scale-95`). El sistema debe sentirse "vivo".
-3. **Modo Oscuro (Dark Mode) Consistente**: 
-   - Busca fondos que se sientan muy brillantes de noche. Asegúrate de que las tarjetas usen `dark:bg-slate-900` o `dark:bg-slate-800` y textos `dark:text-white` o `dark:text-slate-300`.
-4. **Auditoría de Consola y Advertencias**:
-   - Abre las herramientas de desarrollador del navegador (F12) y revisa la consola. Si encuentras advertencias de React (ej. falta de `key` en listas, clases anidadas incorrectas) o errores leves, arréglalos.
-5. **Píldoras, Badges e Íconos**:
-   - Revisa los estados (Confirmado, Pendiente, Cancelado). Asegúrate de que los colores sean consistentes. Todo el proyecto usa `lucide-react`, si ves íconos que no encajan, cámbialos.
-6. **Mejoras de Accesibilidad y UX**:
-   - Si crees que un texto es muy pequeño o un contraste de colores dificulta la lectura, mejóralo. Tu instinto de diseño manda aquí.
+## Lectura obligatoria antes de modificar código
 
-**Regla de Oro**: ¡No toques los "hooks" complejos (`useState`, `useEffect`) de lógica de negocio profunda ni el flujo de datos! Concéntrate en la experiencia visual, la fluidez y en arreglar advertencias menores.
+1. [BASELINE.md](./BASELINE.md) — estado real y deuda vigente.
+2. [CURRENT_WORK.md](./docs/roadmap/CURRENT_WORK.md) — siguiente frente exacto y Definition of Done.
+3. [AI_CONTEXT.md](./AI_CONTEXT.md) — reglas técnicas obligatorias.
+4. [AGENT_PROTOCOL.md](./AGENT_PROTOCOL.md) — protocolo para agentes de IA.
+5. [INDEX.md](./INDEX.md) — mapa documental completo.
+6. [Roadmap](./docs/roadmap/ROADMAP.md) — secuencia de evolución.
 
-### 🗺️ Mapa de Rutas Disponibles (UI)
-Para facilitar tus pruebas, aquí tienes todas las rutas que ya están maquetadas en el sistema. Puedes acceder a ellas directamente desde tu navegador (`http://localhost:3000/...`):
+Una persona nueva debe completar la guía [Onboarding en 15 minutos](./docs/guides/ONBOARDING_15_MIN.md) antes de realizar cambios.
 
-**Pública / Autenticación:**
-* `/` - Pantalla de Login (Glassmorphism)
-* `/verify/12345` - Vista Pública de Validación de Vouchers (QR)
+## Arquitectura de alto nivel
 
-**Panel de Administrador (Root):**
-* `/admin` - Dashboard Principal
-* `/admin/vessels` - Grid de Embarcaciones y Estados
-* `/admin/audit` - Tabla de Historial de Auditoría
-
-**Portal B2B (Agencias de Viaje):**
-* `/agency` - Buscador de Disponibilidad (con máscara de fecha y reservas)
-* `/agency/reservations` - Historial de Mis Reservas y descarga de vouchers
-
-**App Móvil (Dueños de Embarcación / Capitanes):**
-* `/operator` - Inicio / Dashboard Móvil (Próximo Zarpe)
-* `/operator/availability` - Gestor Táctil de Cupos (+ / -)
-
----
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```mermaid
+flowchart LR
+  A[Admin Web] --> N[Next.js App Router]
+  B[Agency Web] --> N
+  C[Operator Web] --> N
+  N --> AUTH[Supabase Auth + RLS]
+  N --> RPC[PostgreSQL RPC]
+  RPC --> DB[(PostgreSQL)]
+  N --> VERIFY[Public Voucher Verification]
+  OFF[IndexedDB + Outbox futuro] -. sync .-> N
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Detalles: [docs/architecture/system-overview.md](./docs/architecture/system-overview.md).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js 16.3.4, App Router y Turbopack.
+- React 19.2.4 + TypeScript 5 en modo `strict`.
+- Tailwind CSS 4.
+- Supabase SSR / Supabase JS.
+- PostgreSQL + RLS + funciones RPC mediante migraciones Supabase append-only.
+- GitHub Actions para gates de documentación, producción, integración Supabase y E2E crítico.
+- Playwright fijado en CI para el gate de navegador, sin incorporarlo todavía al lockfile principal.
 
-## Learn More
+## Rutas actuales
 
-To learn more about Next.js, take a look at the following resources:
+| Área | Ruta | Estado |
+|---|---|---|
+| Login | `/` | Funcional; redirect y `next` protegidos por rol |
+| Admin | `/admin` | Parcial; altas reales de agencias/tours/embarcaciones |
+| Agencias | `/agency` | Búsqueda server-side, contexto de agencia, comisión y reserva reales |
+| Reservas agencia | `/agency/reservations` | Historial/cancelación reales; holds disponibles en backend |
+| Operador | `/operator` | Ownership de flota validado; operación todavía parcial |
+| Cupos | `/operator/availability` | Mutación por RPC con ownership |
+| Redención operador | `/operator/redeem` | Verificación y redención online mediante RPC atómico |
+| Voucher público | `/verify/[token]` | Validación online, QR y estado de redención |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Inicio rápido
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm ci
+cp .env.example .env.local
+# Configura las variables públicas de Supabase
+supabase start
+supabase db reset
+npm run dev
+```
 
-## Deploy on Vercel
+El lockfile está sincronizado y `npm ci` es la instalación autoritativa. Un fallo de `npm ci` es un bloqueo nuevo, no una deuda aceptada.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Comandos de calidad
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run docs:validate
+npm run docs:health
+npm run changelog:validate
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+Para pruebas RLS/RPC reales, con Supabase local levantado y variables locales de prueba:
+
+```bash
+npm run test:integration
+```
+
+El baseline actual es **38/38** pruebas de integración. `Critical E2E` valida en Chromium el flujo agency → búsqueda → reserva → voucher y el flujo operator → redención → bloqueo del segundo uso. La guía completa está en [docs/guides/TESTING.md](./docs/guides/TESTING.md).
+
+## Flujo Git obligatorio
+
+```text
+dev actualizado
+  ↓ crear feature/*, fix/* o docs/*
+rama de trabajo
+  ↓ pruebas + PR + CI + review
+dev
+  ↓ solo al cerrar un hito
+PR dev → main
+```
+
+**No hacer push ni merge directo a `dev` o `main`.** Aunque GitHub todavía no aplique todas las reglas de protección en `dev`, la política del proyecto sigue siendo obligatoria. Ver [docs/guides/GIT_WORKFLOW.md](./docs/guides/GIT_WORKFLOW.md).
+
+## Principios no negociables
+
+- No bypass de RLS para resolver problemas de permisos.
+- No lógica crítica de inventario, pagos o redención en el cliente.
+- No mocks presentados como funcionalidad productiva.
+- No merge con CI rojo.
+- No cambio de contratos, roles, tablas o comportamiento público sin documentación asociada.
+- No confundir total reservado con dinero cobrado.
+- Reservas productivas deben pasar por RPC transaccional.
+- Cambios de permisos requieren pruebas positivas y negativas contra Supabase real.
+
+## Próximo frente
+
+**C3.1 — Payments & Booking Lifecycle**.
+
+Objetivo inmediato: crear un ledger de pagos separado de `reservations.total_price`, definir estados e idempotencia de pago/conciliación y preparar el flujo autoritativo `hold → pago aprobado → confirmación → voucher`, sin fingir cobros desde UI. No integrar un proveedor externo hasta que exista una decisión explícita de proveedor/contrato. Alcance y DoD: [CURRENT_WORK.md](./docs/roadmap/CURRENT_WORK.md).
+
+## Estado de producción
+
+Los criterios completos están en [PRODUCTION_READINESS.md](./docs/guides/PRODUCTION_READINESS.md). `dev` está estabilizado y probado, pero `main` todavía no debe tratarse como release productivo.
